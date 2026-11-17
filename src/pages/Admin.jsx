@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { BRAND } from '../brand.js';
 
 const API = import.meta.env.VITE_API_URL || '';
 const STATUSES = ['Order Received', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'];
@@ -169,17 +170,17 @@ export default function Admin() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-sm">
-          <img src="/images/logo.png" alt="Breadwrapz" className="h-16 mx-auto mb-6 object-contain" />
+          <img src={BRAND.logo} alt={BRAND.displayName} className="h-16 w-48 mx-auto mb-6 object-contain" />
           <h2 className="text-2xl font-black text-center text-gray-900 mb-6">Admin Login</h2>
           <input
             type="password" placeholder="Enter admin password" value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loggingIn && login()}
-            className="w-full px-5 py-4 border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-orange-500 mb-4"
+            className="w-full px-5 py-4 border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-brand-forest mb-4"
           />
           {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
           <button onClick={login} disabled={loggingIn}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-black py-4 rounded-2xl transition">
+            className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:opacity-60 text-brand-forest font-black py-4 rounded-2xl transition">
             {loggingIn ? 'Checking...' : 'Login'}
           </button>
         </div>
@@ -195,12 +196,12 @@ export default function Admin() {
         {/* Desktop header */}
         <div className="hidden md:flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <img src="/images/logo.png" alt="Breadwrapz" className="h-12 object-contain" />
+            <img src={BRAND.logo} alt={BRAND.displayName} className="h-12 w-44 object-contain" />
             <h1 className="text-3xl font-black text-gray-900">Dashboard</h1>
           </div>
           <div className="flex gap-3">
             <button onClick={() => { fetchOrders(key); fetchReviews(key); fetchMenu(key); }}
-              className="px-5 py-2 bg-orange-500 text-white rounded-full font-bold hover:bg-orange-600 transition">Refresh</button>
+              className="px-5 py-2 bg-brand-lime text-brand-forest rounded-full font-bold hover:bg-brand-lime-hover transition">Refresh</button>
             <button onClick={() => { sessionStorage.removeItem('adminKey'); setKey(''); }}
               className="px-5 py-2 bg-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-300 transition">Logout</button>
           </div>
@@ -208,10 +209,10 @@ export default function Admin() {
 
         {/* Mobile header */}
         <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40 px-4 py-3 flex items-center justify-between">
-          <img src="/images/logo.png" alt="Breadwrapz" className="h-10 object-contain" />
+          <img src={BRAND.logo} alt={BRAND.displayName} className="h-10 w-36 object-contain" />
           <div className="flex gap-2">
             <button onClick={() => { fetchOrders(key); fetchReviews(key); fetchMenu(key); }}
-              className="p-2 bg-orange-100 text-orange-500 rounded-full">↻</button>
+              className="p-2 bg-brand-soft text-brand-forest rounded-full">↻</button>
             <button onClick={() => { sessionStorage.removeItem('adminKey'); setKey(''); }}
               className="p-2 bg-gray-100 text-gray-600 rounded-full">✕</button>
           </div>
@@ -225,9 +226,9 @@ export default function Admin() {
             { id: 'menu', label: 'Menu', badge: 0 },
           ].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`px-6 py-2.5 rounded-full font-bold text-sm transition ${tab === t.id ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-orange-50'}`}>
+              className={`px-6 py-2.5 rounded-full font-bold text-sm transition ${tab === t.id ? 'bg-brand-lime text-brand-forest' : 'bg-white text-gray-600 border border-gray-200 hover:bg-brand-soft'}`}>
               {t.label}
-              {t.badge > 0 && <span className="ml-1.5 bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full text-xs">{t.badge}</span>}
+              {t.badge > 0 && <span className="ml-1.5 bg-brand-soft text-brand-forest px-1.5 py-0.5 rounded-full text-xs">{t.badge}</span>}
             </button>
           ))}
         </div>
@@ -241,14 +242,14 @@ export default function Admin() {
                   <div key={order.orderId} className="bg-white rounded-3xl shadow p-6 border border-gray-100">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
                       <div>
-                        <p className="text-xs text-orange-500 font-bold uppercase tracking-widest">{order.orderId}</p>
+                        <p className="text-xs text-brand-forest font-bold uppercase tracking-widest">{order.orderId}</p>
                         <p className="text-xl font-black text-gray-900 mt-1">{order.customerName || 'N/A'}</p>
                         <p className="text-gray-500 text-sm mt-1">{order.customerPhone || order.contact}</p>
                         <p className="text-gray-600 text-sm mt-1">📍 {order.deliveryLocation}</p>
                         <p className="text-gray-400 text-xs mt-1">{new Date(order.createdAt).toLocaleString()}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-black text-orange-500">₦{Number(order.amount).toLocaleString()}</p>
+                        <p className="text-2xl font-black text-brand-forest">₦{Number(order.amount).toLocaleString()}</p>
                         <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold ${
                           order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
                           order.status === 'Out for Delivery' ? 'bg-blue-100 text-blue-700' :
@@ -272,7 +273,7 @@ export default function Admin() {
                         {STATUSES.map(status => (
                           <button key={status} onClick={() => updateStatus(order.orderId, status)}
                             disabled={updating === order.orderId || order.status === status}
-                            className={`px-4 py-2 rounded-full text-sm font-bold transition ${order.status === status ? 'bg-orange-500 text-white cursor-default' : 'bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700'} disabled:opacity-60`}>
+                            className={`px-4 py-2 rounded-full text-sm font-bold transition ${order.status === status ? 'bg-brand-lime text-brand-forest cursor-default' : 'bg-gray-100 text-gray-700 hover:bg-brand-soft hover:text-brand-forest'} disabled:opacity-60`}>
                             {status}
                           </button>
                         ))}
@@ -291,16 +292,16 @@ export default function Admin() {
                 {pendingReviews.map(review => (
                   <div key={review.id} className="bg-white rounded-3xl shadow p-5 border border-gray-100">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center font-black text-orange-500 text-sm flex-shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-brand-soft flex items-center justify-center font-black text-brand-forest text-sm flex-shrink-0">
                         {review.user_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-black text-gray-900 text-sm">{review.user_name}</p>
                         <p className="text-xs text-gray-400">{new Date(review.created_at).toLocaleString()}</p>
                       </div>
-                      <div className="flex gap-0.5 text-orange-400 text-sm flex-shrink-0">
+                      <div className="flex gap-0.5 text-brand-forest text-sm flex-shrink-0">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={i < review.rating ? 'text-orange-400' : 'text-gray-200'}>★</span>
+                          <span key={i} className={i < review.rating ? 'text-brand-forest' : 'text-gray-200'}>★</span>
                         ))}
                       </div>
                     </div>
@@ -332,35 +333,35 @@ export default function Admin() {
             {/* Add new item button / form */}
             {!showAddForm ? (
               <button onClick={() => { setShowAddForm(true); setMenuError(''); setMenuMsg(''); }}
-                className="w-full mb-6 py-3 rounded-2xl border-2 border-dashed border-orange-300 text-orange-500 font-bold text-sm hover:bg-orange-50 transition">
+                className="w-full mb-6 py-3 rounded-2xl border-2 border-dashed border-brand-lime text-brand-forest font-bold text-sm hover:bg-brand-soft transition">
                 + Add New Menu Item
               </button>
             ) : (
-              <div className="bg-white rounded-3xl shadow p-6 border border-orange-200 mb-6">
+              <div className="bg-white rounded-3xl shadow p-6 border border-brand-lime/30 mb-6">
                 <h3 className="font-black text-gray-900 mb-4">New Menu Item</h3>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <input placeholder="Item name *" value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
-                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-orange-500" />
+                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-brand-forest" />
                   <input placeholder="Price (₦) *" type="number" value={addForm.price} onChange={e => setAddForm(f => ({ ...f, price: e.target.value }))}
-                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-orange-500" />
+                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-brand-forest" />
                   <select value={addForm.category} onChange={e => setAddForm(f => ({ ...f, category: e.target.value }))}
-                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-orange-500">
+                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-brand-forest">
                     {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                   </select>
                   <div className="flex gap-2 items-center">
                     <input placeholder="Image URL (optional)" value={addForm.image_url} onChange={e => setAddForm(f => ({ ...f, image_url: e.target.value }))}
-                      className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-orange-500" />
-                    <label className={`flex-shrink-0 px-3 py-3 rounded-2xl text-sm font-bold cursor-pointer transition ${uploading ? 'bg-gray-100 text-gray-400' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}>
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-brand-forest" />
+                    <label className={`flex-shrink-0 px-3 py-3 rounded-2xl text-sm font-bold cursor-pointer transition ${uploading ? 'bg-gray-100 text-gray-400' : 'bg-brand-soft text-brand-forest hover:bg-brand-soft-hover'}`}>
                       {uploading ? '...' : '📷'}
                       <input type="file" accept="image/*" className="hidden" disabled={uploading}
                         onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => setAddForm(p => ({ ...p, image_url: url }))); e.target.value = ''; }} />
                     </label>
                   </div>
                   <input placeholder="Description (optional)" value={addForm.description} onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))}
-                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-orange-500 sm:col-span-2" />
+                    className="px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-brand-forest sm:col-span-2" />
                 </div>
                 <div className="flex gap-2 mt-4">
-                  <button onClick={addItem} className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-bold text-sm transition">Save Item</button>
+                  <button onClick={addItem} className="flex-1 py-3 bg-brand-lime hover:bg-brand-lime-hover text-brand-forest rounded-2xl font-bold text-sm transition">Save Item</button>
                   <button onClick={() => { setShowAddForm(false); setAddForm(BLANK_FORM); setMenuError(''); }}
                     className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-bold text-sm transition">Cancel</button>
                 </div>
@@ -379,28 +380,28 @@ export default function Admin() {
                       /* Edit form */
                       <div className="space-y-3">
                         <input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-500" placeholder="Name" />
+                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-forest" placeholder="Name" />
                         <div className="flex gap-2">
                           <input type="number" value={editForm.price} onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-500" placeholder="Price" />
+                            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-forest" placeholder="Price" />
                           <select value={editForm.category} onChange={e => setEditForm(f => ({ ...f, category: e.target.value }))}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-500">
+                            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-forest">
                             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                           </select>
                         </div>
                         <input value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-500" placeholder="Description" />
+                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-forest" placeholder="Description" />
                         <div className="flex gap-2 items-center">
                           <input value={editForm.image_url} onChange={e => setEditForm(f => ({ ...f, image_url: e.target.value }))}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-orange-500" placeholder="Image URL" />
-                          <label className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold cursor-pointer transition ${uploading ? 'bg-gray-100 text-gray-400' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}>
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-forest" placeholder="Image URL" />
+                          <label className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold cursor-pointer transition ${uploading ? 'bg-gray-100 text-gray-400' : 'bg-brand-soft text-brand-forest hover:bg-brand-soft-hover'}`}>
                             {uploading ? '...' : '📷'}
                             <input type="file" accept="image/*" className="hidden" disabled={uploading}
                               onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => setEditForm(p => ({ ...p, image_url: url }))); e.target.value = ''; }} />
                           </label>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={saveEdit} className="flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition">Save</button>
+                          <button onClick={saveEdit} className="flex-1 py-2 bg-brand-lime text-brand-forest rounded-xl font-bold text-sm hover:bg-brand-lime-hover transition">Save</button>
                           <button onClick={() => setEditingId(null)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition">Cancel</button>
                         </div>
                       </div>
@@ -412,7 +413,7 @@ export default function Admin() {
                             <p className="font-black text-gray-900 text-sm truncate">{item.name}</p>
                             <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
                           </div>
-                          <p className="font-black text-orange-500 text-sm flex-shrink-0">₦{Number(item.price).toLocaleString()}</p>
+                          <p className="font-black text-brand-forest text-sm flex-shrink-0">₦{Number(item.price).toLocaleString()}</p>
                         </div>
 
                         {/* Availability */}
@@ -430,7 +431,7 @@ export default function Admin() {
                         {item.available && (
                           <input type="datetime-local" value={unavailableUntil[item.id] || ''}
                             onChange={e => setUnavailableUntil(p => ({ ...p, [item.id]: e.target.value }))}
-                            className="w-full mb-3 px-3 py-1.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-orange-400" />
+                            className="w-full mb-3 px-3 py-1.5 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-brand-forest" />
                         )}
 
                         <div className="flex gap-2">
@@ -462,10 +463,10 @@ export default function Admin() {
             { id: 'menu', icon: '🍽️', label: 'Menu', badge: 0 },
           ].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 flex flex-col items-center py-3 transition ${tab === t.id ? 'text-orange-500 border-t-2 border-orange-500' : 'text-gray-500 border-t-2 border-transparent'}`}>
+              className={`flex-1 flex flex-col items-center py-3 transition ${tab === t.id ? 'text-brand-forest border-t-2 border-brand-lime' : 'text-gray-500 border-t-2 border-transparent'}`}>
               <span className="text-xl mb-0.5">{t.icon}</span>
               <span className="text-xs font-bold">{t.label}</span>
-              {t.badge > 0 && <span className="text-xs bg-orange-500 text-white rounded-full px-1.5 mt-0.5">{t.badge}</span>}
+              {t.badge > 0 && <span className="text-xs bg-brand-lime text-brand-forest rounded-full px-1.5 mt-0.5">{t.badge}</span>}
             </button>
           ))}
         </div>

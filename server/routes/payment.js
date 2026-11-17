@@ -8,7 +8,7 @@ import { createOrder, getOrder, getOrderByReference, updateOrder, getAllOrders }
 import { calculateTotal, calculateDeliveryFee, DELIVERY_FEE } from '../data/menuPrices.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const OWNER_EMAIL = process.env.OWNER_EMAIL || 'breadwrapzfoods@gmail.com';
+const OWNER_EMAIL = process.env.OWNER_EMAIL || '';
 const MAX_ORDER_AMOUNT = 500000; // ₦500,000 hard cap per order
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -38,9 +38,9 @@ function adminKeyValid(provided) {
 }
 
 async function notifyOwnerNewOrder(order) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.RESEND_API_KEY || !OWNER_EMAIL) return;
   const itemList = (order.items || []).map(i => `• ${i.name} — ₦${Number(i.price).toLocaleString()}`).join('\n');
-  const fromAddress = `${process.env.RESEND_FROM_NAME || 'Breadwrapz Orders'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
+  const fromAddress = `${process.env.RESEND_FROM_NAME || 'MIKUN Orders'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
   await resend.emails.send({
     from: fromAddress,
     to: OWNER_EMAIL,
@@ -50,8 +50,8 @@ async function notifyOwnerNewOrder(order) {
 }
 
 async function notifyOwnerPaymentConfirmed(order) {
-  if (!process.env.RESEND_API_KEY) return;
-  const fromAddress2 = `${process.env.RESEND_FROM_NAME || 'Breadwrapz Orders'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
+  if (!process.env.RESEND_API_KEY || !OWNER_EMAIL) return;
+  const fromAddress2 = `${process.env.RESEND_FROM_NAME || 'MIKUN Orders'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
   await resend.emails.send({
     from: fromAddress2,
     to: OWNER_EMAIL,
@@ -114,8 +114,8 @@ router.post('/initialize-payment', checkoutLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Order total exceeds maximum allowed amount.' });
     }
 
-    const normalizedEmail = email?.trim().toLowerCase() || `customer+${Date.now()}@breadwrapz.com`;
-    const orderId = `BRD-${Date.now()}`;
+    const normalizedEmail = email?.trim().toLowerCase() || `customer+${Date.now()}@mikun.local`;
+    const orderId = `MKN-${Date.now()}`;
     const reference = orderId;
 
     const userId = getUserIdFromToken(req);

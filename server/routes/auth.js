@@ -44,14 +44,14 @@ async function sendVerificationEmail(user) {
   }
 
   const verificationLink = `${FRONTEND_URL}/verify-email?token=${user.verificationToken}`;
-  const text = `Hello ${user.name},\n\nPlease verify your Breadwrapz account by clicking the link below:\n\n${verificationLink}\n\nIf you did not request this, please ignore this email.\n\nThank you!`;
+  const text = `Hello ${user.name},\n\nPlease verify your MIKUN account by clicking the link below:\n\n${verificationLink}\n\nIf you did not request this, please ignore this email.\n\nThank you!`;
 
   try {
-    const fromAddress = `${process.env.RESEND_FROM_NAME || 'Breadwrapz'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
+    const fromAddress = `${process.env.RESEND_FROM_NAME || 'MIKUN'} <${process.env.RESEND_FROM || 'onboarding@resend.dev'}>`;
     await resend.emails.send({
       from: fromAddress,
       to: user.email,
-      subject: 'Verify your Breadwrapz account',
+      subject: 'Verify your MIKUN account',
       text,
     });
   } catch (error) {

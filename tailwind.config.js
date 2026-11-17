@@ -7,8 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-orange': '#F26522',
-        'brand-orange-dark': '#C4511A',
+        'brand-lime': '#4BEA00',
+        'brand-lime-hover': '#39C900',
+        'brand-forest': '#173B35',
+        'brand-soft': '#E8FFDF',
+        'brand-soft-hover': '#D7FFCA',
         'brand-black': '#111111',
         'brand-white': '#FFFFFF',
       },

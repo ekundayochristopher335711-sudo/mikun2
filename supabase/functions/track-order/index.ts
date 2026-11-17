@@ -8,7 +8,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    // Support both path param (/track-order/BRD-123) and query param (?orderId=BRD-123)
+    // Support both path param (/track-order/MKN-123) and query param (?orderId=MKN-123)
     const pathParts = url.pathname.split('/').filter(Boolean);
     const orderId = pathParts[pathParts.length - 1] !== 'track-order'
       ? pathParts[pathParts.length - 1]

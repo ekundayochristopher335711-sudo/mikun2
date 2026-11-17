@@ -1,4 +1,5 @@
 import React from 'react';
+import { BRAND } from '../brand.js';
 
 const About = () => {
   return (
@@ -7,7 +8,7 @@ const About = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-item-red mb-4">
-            About Breadwrapz
+            About {BRAND.name}
           </h2>
           <p className="text-gray-600 text-lg">
             Our Story and Mission
@@ -20,13 +21,12 @@ const About = () => {
           <div className="bg-gray-50 p-8 rounded-lg">
             <h3 className="text-3xl font-bold text-gray-800 mb-4">Our Story</h3>
             <p className="text-gray-600 text-lg leading-relaxed mb-4">
-              Breadwrapz was founded with a simple mission: to bring fast, tasty wraps and meals to your table. 
-              Our passion for food and culture drives us to prepare every dish with care, using traditional 
-              recipes passed down through generations.
+              MIKUN brings comforting favourites and an easygoing spirit together. From semo and eba to jollof,
+              proteins and a cold drink, our menu gives everyone something to look forward to.
             </p>
             <p className="text-gray-600 text-lg leading-relaxed">
-              From the vibrant streets of Lagos to your doorstep, we deliver tasty wraps, rice meals, and specials in every bite. 
-              Each meal is a celebration of our heritage and commitment to excellence.
+              Find us on Osekita Rd beside 1908 SALOON, close to EKSU in Ado Ekiti. Good food brings us together;
+              good vibes keep us here.
             </p>
           </div>
 

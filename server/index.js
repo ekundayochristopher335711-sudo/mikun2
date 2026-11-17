@@ -31,7 +31,7 @@ if (!process.env.ADMIN_KEY) {
   process.exit(1);
 }
 
-app.use(cors({ origin: [FRONTEND_URL, 'https://breadwrapz2.netlify.app'] }));
+app.use(cors({ origin: [FRONTEND_URL] }));
 app.use(express.json({
   verify: (req, res, buf) => {
     req.rawBody = buf;

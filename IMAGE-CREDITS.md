@@ -1,6 +1,20 @@
-# Breadwrapz menu image sources
+# MIKUN menu image sources
 
-The menu now uses higher-resolution food photography hosted by the original public image hosts rather than the small local menu thumbnails.
+The active menu uses local food photographs in `public/images`, so its images do not depend on external hosts. The original source and usage rights for the pre-existing local photos (including `landingpage.png` and its optimized WebP copy) are not documented in this repository; confirm them before commercial publication.
+
+## Photographs downloaded for the active menu
+
+| Local file | Photo and source | License | Changes |
+| --- | --- | --- | --- |
+| `public/images/chicken-pasta-pack.jpg` | [Grilled chicken pasta by Arne Buss](https://unsplash.com/photos/grilled-chicken-pasta-fresh-salad-bread-and-wine-on-table-r5L6WGbTwUs) | [Unsplash License](https://unsplash.com/license): commercial use permitted; attribution appreciated but not required | Downloaded a 1200 px JPEG from Unsplash's image CDN; no other edits |
+| `public/images/chicken-vegetable-noodles.jpg` | [Chicken and vegetable noodles by Mohammad Fahim](https://unsplash.com/photos/a-plate-of-delicious-noodles-with-vegetables-and-chicken--q8D0-ELL3E) | [Unsplash License](https://unsplash.com/license): commercial use permitted; attribution appreciated but not required | Downloaded a 1200 px JPEG from Unsplash's image CDN; no other edits |
+| `public/images/rice-beans-turkey.jpg` | [Jollof rice, plantain, bean porridge and turkey by Jide Charles (Jidus)](https://commons.wikimedia.org/wiki/File:Jollof_rice,_plantain,_bean_porridge_and_turkey.jpg) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/): credit, license link, and change notice required | Original file, unmodified |
+
+For public attribution of the rice and beans photo, use: "Photo: Jide Charles (Jidus), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Jollof_rice,_plantain,_bean_porridge_and_turkey.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) (unmodified)."
+
+## Earlier source notes
+
+These notes record earlier image references. They do not confirm rights for the pre-existing local copies or represent the current menu image mapping.
 
 - Nigerian jollof: Wikimedia Commons — https://commons.wikimedia.org/wiki/File:Nigerian_jollof.jpg — CC BY-SA 4.0, author Adewuyi Israel.
 - Amala: SnapCalorie image source.

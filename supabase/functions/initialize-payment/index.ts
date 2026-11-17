@@ -3,7 +3,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { calculateDeliveryFee, DELIVERY_FEE, calculatePaystackFee } from '../_shared/menuPrices.ts';
 
 const MAX_ORDER_AMOUNT = 500000;
-const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || 'breadwrapzfoods@gmail.com';
+const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || '';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -40,8 +40,8 @@ Deno.serve(async (req: Request) => {
     if (amount <= 0) return json({ error: 'Order total must be greater than zero.' }, 400);
     if (amount > MAX_ORDER_AMOUNT) return json({ error: 'Order total exceeds maximum allowed amount.' }, 400);
 
-    const normalizedEmail = email?.trim().toLowerCase() || `customer+${Date.now()}@breadwrapz.com`;
-    const orderId = `BRD-${Date.now()}`;
+    const normalizedEmail = email?.trim().toLowerCase() || `customer+${Date.now()}@mikun.local`;
+    const orderId = `MKN-${Date.now()}`;
     const reference = orderId;
 
     const supabase = supabaseForPrices;
@@ -82,7 +82,7 @@ Deno.serve(async (req: Request) => {
         email: normalizedEmail,
         amount: Math.round(amount * 100),
         reference,
-        callback_url: Deno.env.get('PAYSTACK_CALLBACK_URL') || 'https://breadwrapz2.netlify.app',
+        callback_url: Deno.env.get('PAYSTACK_CALLBACK_URL') || Deno.env.get('FRONTEND_URL') || 'http://localhost:5173',
         metadata: { orderId, contact, deliveryLocation, items, deliveryDistanceKm: parsedDistance, deliveryFee: computedDeliveryFee },
       }),
     });
@@ -91,13 +91,13 @@ Deno.serve(async (req: Request) => {
 
     // Fire-and-forget owner notification
     const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (resendKey) {
+    if (resendKey && OWNER_EMAIL) {
       const itemList = (items as any[]).map((i) => `• ${i.name} — ₦${Number(i.price).toLocaleString()}`).join('\n');
       fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: `${Deno.env.get('RESEND_FROM_NAME') || 'Breadwrapz Orders'} <${Deno.env.get('RESEND_FROM') || 'onboarding@resend.dev'}>`,
+          from: `${Deno.env.get('RESEND_FROM_NAME') || 'MIKUN Orders'} <${Deno.env.get('RESEND_FROM') || 'onboarding@resend.dev'}>`,
           to: OWNER_EMAIL,
           subject: `New Order ${orderId} — ₦${Number(amount).toLocaleString()}`,
           text: `New order received!\n\nOrder ID: ${orderId}\nCustomer: ${customerName || 'N/A'}\nPhone: ${customerPhone || contact}\nDelivery: ${deliveryLocation}\n\nItems:\n${itemList}\n\nTotal: ₦${Number(amount).toLocaleString()}\n\nStatus: Order Received`,

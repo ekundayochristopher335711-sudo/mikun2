@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { BRAND } from '../brand.js';
 
 const Navbar = ({ cartCount, onCartClick }) => {
   return (
@@ -9,8 +10,8 @@ const Navbar = ({ cartCount, onCartClick }) => {
           {/* Logo & Brand */}
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition">
             <img
-              src="/images/breadwrapz-logo.svg"
-              alt="Breadwrapz Logo"
+              src={BRAND.logo}
+              alt={BRAND.displayName}
               className="h-28 w-28 md:h-36 md:w-36 object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -25,8 +26,8 @@ const Navbar = ({ cartCount, onCartClick }) => {
             </Link>
                   <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition -mt-3">
                     <img
-                      src="/images/breadwrapz-logo.svg"
-                      alt="Breadwrapz Logo"
+                      src={BRAND.logo}
+                      alt={BRAND.displayName}
                       className="h-28 w-28 md:h-36 md:w-36 object-contain"
                       onError={(e) => {
                         e.target.style.display = 'none';

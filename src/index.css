@@ -33,21 +33,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #F26522;
+  background: #4BEA00;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C4511A;
+  background: #39C900;
 }
 
 /* Custom button styles */
 .btn-primary {
-  @apply bg-brand-orange hover:bg-brand-orange-dark text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105;
+  @apply bg-brand-lime hover:bg-brand-lime-hover text-brand-forest px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105;
 }
 
 .btn-secondary {
-  @apply bg-white border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300;
+  @apply bg-white border-2 border-brand-lime text-brand-forest hover:bg-brand-lime px-6 py-3 rounded-lg font-semibold transition-all duration-300;
 }
 
 /* Glassmorphism styles */
@@ -95,13 +95,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Gradient backgrounds */
 .gradient-bg {
-  background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(139, 0, 0, 0.1));
+  background: linear-gradient(135deg, rgba(75, 234, 0, 0.1), rgba(23, 59, 53, 0.1));
 }
 
 .hero-gradient {
   background: linear-gradient(45deg,
-    rgba(242, 101, 34, 0.18) 0%,
-    rgba(196, 81, 26, 0.1) 50%,
+    rgba(75, 234, 0, 0.18) 0%,
+    rgba(57, 201, 0, 0.1) 50%,
     rgba(255, 255, 255, 0.1) 100%);
 }
 
@@ -113,8 +113,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Subtle background pattern */
 .bg-pattern {
   background-image:
-    radial-gradient(circle at 25% 25%, rgba(220, 20, 60, 0.05) 2px, transparent 2px),
-    radial-gradient(circle at 75% 75%, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+    radial-gradient(circle at 25% 25%, rgba(75, 234, 0, 0.05) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(75, 234, 0, 0.03) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
@@ -218,4 +218,195 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out;
+}
+
+/* MIKUN hero: real food photography with code-driven depth and movement. */
+.mikun-hero {
+  isolation: isolate;
+  background: #173b35;
+}
+
+.mikun-hero-glow {
+  position: absolute;
+  z-index: -1;
+  width: min(75vw, 900px);
+  aspect-ratio: 1;
+  left: -18%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(75, 234, 0, 0.16), rgba(75, 234, 0, 0.04) 43%, transparent 70%);
+  pointer-events: none;
+  animation: mikun-glow-breathe 7s ease-in-out infinite;
+}
+
+.mikun-hero-title,
+.mikun-hero-caption-title,
+.mikun-hero-proof strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+}
+
+.mikun-hero-title span {
+  transform-origin: left center;
+}
+
+.mikun-hero-visual {
+  min-height: 360px;
+  touch-action: pan-y;
+  perspective: 1100px;
+}
+
+.mikun-hero-photo-shell {
+  z-index: 1;
+  transform-style: preserve-3d;
+}
+
+.mikun-hero-photo-float {
+  aspect-ratio: 1.04;
+  animation: mikun-photo-float 6.5s ease-in-out infinite;
+}
+
+.mikun-hero-photo {
+  display: block;
+  object-position: center;
+  transform: scale(1.04);
+  animation: mikun-photo-zoom 11s ease-in-out infinite alternate;
+}
+
+.mikun-hero-orbit {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  border: 1px solid rgba(75, 234, 0, 0.72);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mikun-hero-orbit::after {
+  content: '';
+  position: absolute;
+  top: 12%;
+  left: 13%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4bea00;
+  box-shadow: 0 0 20px rgba(75, 234, 0, 0.7);
+}
+
+.mikun-hero-orbit-one {
+  width: 100%;
+  aspect-ratio: 1;
+  animation: mikun-orbit-spin 22s linear infinite;
+}
+
+.mikun-hero-orbit-two {
+  width: 78%;
+  aspect-ratio: 1;
+  opacity: 0.45;
+  animation: mikun-orbit-spin-reverse 17s linear infinite;
+}
+
+.mikun-hero-orbit-two::after {
+  width: 7px;
+  height: 7px;
+}
+
+.mikun-hero-orbit-dot {
+  position: absolute;
+  z-index: 2;
+  left: 2%;
+  top: 17%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #4bea00;
+  box-shadow: 0 0 0 10px rgba(75, 234, 0, 0.1), 0 0 28px rgba(75, 234, 0, 0.55);
+  animation: mikun-dot-pulse 3.2s ease-in-out infinite;
+}
+
+.mikun-hero-badge {
+  animation: mikun-badge-float 4.5s ease-in-out infinite;
+}
+
+.mikun-hero-proof > div {
+  min-width: 0;
+}
+
+.mikun-hero-proof > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  padding-left: clamp(10px, 2vw, 22px);
+}
+
+.mikun-hero-proof strong,
+.mikun-hero-proof span {
+  display: block;
+}
+
+.mikun-hero-proof strong {
+  font-size: clamp(15px, 1.5vw, 22px);
+  line-height: 1.2;
+}
+
+.mikun-hero-proof span {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(10px, 1vw, 13px);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+@keyframes mikun-photo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes mikun-photo-zoom {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.1); }
+}
+
+@keyframes mikun-orbit-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes mikun-orbit-spin-reverse {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes mikun-glow-breathe {
+  0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+  50% { opacity: 1; transform: translateY(-50%) scale(1.12); }
+}
+
+@keyframes mikun-dot-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes mikun-badge-float {
+  0%, 100% { transform: translateY(0) rotate(5deg); }
+  50% { transform: translateY(-12px) rotate(-5deg); }
+}
+
+@media (max-width: 640px) {
+  .mikun-hero-visual { min-height: 290px; }
+  .mikun-hero-photo-shell { width: 82%; }
+  .mikun-hero-photo-float { border-radius: 2rem; }
+  .mikun-hero-proof strong { font-size: 14px; }
+  .mikun-hero-proof span { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mikun-hero-glow,
+  .mikun-hero-photo-float,
+  .mikun-hero-photo,
+  .mikun-hero-orbit,
+  .mikun-hero-orbit-dot,
+  .mikun-hero-badge {
+    animation: none;
+  }
 }

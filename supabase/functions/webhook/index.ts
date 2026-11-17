@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || 'breadwrapzfoods@gmail.com';
+const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || '';
 
 Deno.serve(async (req: Request) => {
   const secret = Deno.env.get('PAYSTACK_WEBHOOK_SECRET');
@@ -54,12 +54,12 @@ Deno.serve(async (req: Request) => {
       console.log(`Webhook: order ${order.order_id} confirmed.`);
 
       const resendKey = Deno.env.get('RESEND_API_KEY');
-      if (resendKey) {
+      if (resendKey && OWNER_EMAIL) {
         fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from: `${Deno.env.get('RESEND_FROM_NAME') || 'Breadwrapz Orders'} <${Deno.env.get('RESEND_FROM') || 'onboarding@resend.dev'}>`,
+            from: `${Deno.env.get('RESEND_FROM_NAME') || 'MIKUN Orders'} <${Deno.env.get('RESEND_FROM') || 'onboarding@resend.dev'}>`,
             to: OWNER_EMAIL,
             subject: `✅ Payment Confirmed — ${order.order_id}`,
             text: `Payment confirmed for order ${order.order_id}.\n\nCustomer: ${order.customer_name || 'N/A'}\nPhone: ${order.customer_phone || order.contact}\nDelivery: ${order.delivery_location}\nTotal: ₦${Number(order.amount).toLocaleString()}\n\nYou can now prepare this order.`,

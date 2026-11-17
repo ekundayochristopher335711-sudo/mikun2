@@ -1,0 +1,15 @@
+export const BRAND = {
+  name: 'MIKUN',
+  displayName: 'MIKUN GOOD FOOD GOOD VIBE',
+  tagline: 'Good Food, Good Vibe',
+  logo: '/mikun logo (4).png',
+  iconLogo: '/mikun logo (2).png',
+  phone: '0906 867 8820',
+  phoneIntl: '+2349068678820',
+  address: 'Osekita Rd, adjacent 1908 SALOON, EKSU, Ado Ekiti 360101, Ekiti',
+  mapsQuery: 'P794+PR Ado Ekiti',
+  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=P794%2BPR%20Ado%20Ekiti',
+  hours: 'Open · Closes 10 pm',
+  city: 'Ado Ekiti',
+  coordinates: { lat: 7.6232482, lng: 5.22274 },
+};
