@@ -3,8 +3,6 @@ import { MENU_IMAGE_URLS as I } from './menuImageUrls.js';
 // MIKUN menu transcribed from the supplied menu board. Keep these prices in sync
 // with the customer-facing menu and the payment validation data.
 export const menuDataNoImages = [
-  { id: 1, name: 'Semo with Beef', price: 1500, desc: 'Smooth semo served with seasoned beef stew.', category: 'Dishes', available: true, image: I.semoBeef },
-  { id: 2, name: 'Eba with Beef', price: 1500, desc: 'Soft eba served with seasoned beef stew.', category: 'Dishes', available: true, image: I.ebaBeef },
   { id: 3, name: 'Small Plate of Jollof & Fried Rice with Beef', price: 1700, desc: 'A small mixed plate of jollof and fried rice with beef.', category: 'Dishes', available: true, image: I.jollofFriedRiceBeef },
   { id: 4, name: 'Spag with Beef', price: 1700, desc: 'Spaghetti with rich beef sauce.', category: 'Dishes', available: true, image: I.spagBeef },
   { id: 5, name: 'Pounded Yam per Plate', price: 1700, desc: 'One plate of smooth pounded yam with soup.', category: 'Dishes', available: true, image: I.poundedYam },

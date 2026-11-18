@@ -7,9 +7,28 @@ const STATUSES = ['Order Received', 'Confirmed', 'Preparing', 'Out for Delivery'
 const CATEGORIES = ['Dishes', 'Proteins', 'Drinks'];
 
 const BLANK_FORM = { name: '', description: '', price: '', category: 'Dishes', image_url: '' };
+const DEMO_ADMIN_KEY = 'mikun-demo';
+const DEMO_ORDERS = [
+  {
+    orderId: 'MK-DEMO-001', customerName: 'Ada Adesina', customerPhone: '0803 000 0000',
+    deliveryLocation: 'Ado Ekiti', amount: 5200, status: 'Order Received',
+    createdAt: '2026-11-18T12:10:00.000Z', items: [{ name: 'Jollof & Fried Rice with Beef', price: 2200 }, { name: 'Big Chicken', price: 2500 }],
+  },
+  {
+    orderId: 'MK-DEMO-002', customerName: 'Tunde Adebayo', customerPhone: '0810 000 0000',
+    deliveryLocation: 'Bawa Estate', amount: 3000, status: 'Preparing',
+    createdAt: '2026-11-18T11:35:00.000Z', items: [{ name: 'Asun Jollof with Beef', price: 2600 }, { name: 'Table Water', price: 250 }],
+  },
+];
+const DEMO_REVIEWS = [{ id: 'demo-review-1', user_name: 'Kemi O.', rating: 5, comment: 'The food arrived hot and full of flavour. Good vibes indeed!', created_at: '2026-11-18T10:30:00.000Z' }];
+const demoMenu = () => menuDataNoImages.map(item => ({
+  id: item.id, name: item.name, description: item.desc, price: item.price,
+  category: item.category, available: item.available, image_url: item.image,
+}));
 
 export default function Admin() {
   const [key, setKey] = useState(() => sessionStorage.getItem('adminKey') || '');
+  const [isDemoMode, setIsDemoMode] = useState(() => sessionStorage.getItem('adminDemo') === 'true');
   const [input, setInput] = useState('');
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
@@ -36,6 +55,11 @@ export default function Admin() {
 
   // ── Fetchers ──────────────────────────────────────────────────────────────
   const fetchOrders = useCallback(async (adminKey) => {
+    if (adminKey === DEMO_ADMIN_KEY) {
+      setOrders(DEMO_ORDERS);
+      setError('');
+      return;
+    }
     try {
       const res = await fetch(`${API}/admin-orders`, { headers: { 'x-admin-key': adminKey } });
       if (res.status === 401) { setError('Wrong password.'); return; }
@@ -45,6 +69,10 @@ export default function Admin() {
   }, []);
 
   const fetchReviews = useCallback(async (adminKey) => {
+    if (adminKey === DEMO_ADMIN_KEY) {
+      setPendingReviews(DEMO_REVIEWS);
+      return;
+    }
     try {
       const res = await fetch(`${API}/admin-reviews`, { headers: { 'x-admin-key': adminKey } });
       if (res.ok) setPendingReviews(await res.json());
@@ -52,6 +80,11 @@ export default function Admin() {
   }, []);
 
   const fetchMenu = useCallback(async (adminKey) => {
+    if (adminKey === DEMO_ADMIN_KEY) {
+      setMenuItems(demoMenu());
+      setMenuLoading(false);
+      return;
+    }
     setMenuLoading(true);
     try {
       const res = await fetch(`${API}/admin-menu`, { headers: { 'x-admin-key': adminKey } });
@@ -88,6 +121,16 @@ export default function Admin() {
     if (!k) { setError('Please enter the admin password.'); return; }
     setError(''); setLoggingIn(true);
     try {
+      if (k === DEMO_ADMIN_KEY) {
+        sessionStorage.setItem('adminKey', k);
+        sessionStorage.setItem('adminDemo', 'true');
+        setIsDemoMode(true);
+        setKey(k);
+        setOrders(DEMO_ORDERS);
+        setPendingReviews(DEMO_REVIEWS);
+        setMenuItems(demoMenu());
+        return;
+      }
       const res = await fetch(`${API}/admin-orders`, { headers: { 'x-admin-key': k } });
       if (res.status === 401) { setError('Wrong password.'); return; }
       if (!res.ok) { setError('Could not connect to server.'); return; }
@@ -100,6 +143,11 @@ export default function Admin() {
   // ── Orders ─────────────────────────────────────────────────────────────────
   const updateStatus = async (orderId, status) => {
     setUpdating(orderId);
+    if (isDemoMode) {
+      setOrders((current) => current.map((order) => order.orderId === orderId ? { ...order, status } : order));
+      setUpdating(null);
+      return;
+    }
     try {
       await fetch(`${API}/admin-orders`, {
         method: 'POST',
@@ -114,6 +162,11 @@ export default function Admin() {
   // ── Reviews ────────────────────────────────────────────────────────────────
   const handleReview = async (id, action) => {
     setReviewAction(id);
+    if (isDemoMode) {
+      setPendingReviews((current) => current.filter((review) => review.id !== id));
+      setReviewAction(null);
+      return;
+    }
     try {
       await fetch(`${API}/admin-reviews`, {
         method: 'POST',
@@ -128,6 +181,16 @@ export default function Admin() {
   // ── Menu CRUD ──────────────────────────────────────────────────────────────
   const menuCall = async (body) => {
     setMenuMsg(''); setMenuError('');
+    if (isDemoMode) {
+      setMenuItems((current) => {
+        if (body.action === 'add') return [...current, { ...body, id: `demo-${Date.now()}`, available: true, image_url: body.image_url || '' }];
+        if (body.action === 'delete') return current.filter((item) => item.id !== body.id);
+        if (body.action === 'toggle') return current.map((item) => item.id === body.id ? { ...item, available: body.available, unavailable_until: body.unavailableUntil } : item);
+        if (body.action === 'edit') return current.map((item) => item.id === body.id ? { ...item, ...body } : item);
+        return current;
+      });
+      return true;
+    }
     const res = await fetch(`${API}/admin-menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
@@ -181,24 +244,34 @@ export default function Admin() {
     setTogglingId(null);
   };
 
+  const logout = () => {
+    sessionStorage.removeItem('adminKey');
+    sessionStorage.removeItem('adminDemo');
+    setIsDemoMode(false);
+    setKey('');
+  };
+
   // ── Login screen ───────────────────────────────────────────────────────────
   if (!key) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-sm">
+      <div className="mikun-admin-login flex min-h-screen items-center justify-center px-4">
+        <div className="mikun-admin-login-card w-full max-w-sm rounded-3xl p-8 sm:p-10">
           <img src={BRAND.logo} alt={BRAND.displayName} className="h-16 w-48 mx-auto mb-6 object-contain" />
-          <h2 className="text-2xl font-black text-center text-gray-900 mb-6">Admin Login</h2>
+          <p className="mikun-admin-kicker text-center">MIKUN&apos;S ADMIN</p>
+          <h2 className="mt-2 text-center text-2xl font-black text-white">Welcome back</h2>
+          <p className="mt-2 text-center text-sm text-white/50">Use your admin password to continue.</p>
           <input
             type="password" placeholder="Enter admin password" value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loggingIn && login()}
-            className="w-full px-5 py-4 border-2 border-gray-300 rounded-2xl text-gray-900 focus:outline-none focus:border-brand-forest mb-4"
+            className="mikun-admin-input mt-6 w-full rounded-xl px-5 py-4 text-white focus:outline-none mb-4"
           />
-          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+          {error && <p className="mb-3 text-sm text-pink-300">{error}</p>}
           <button onClick={login} disabled={loggingIn}
-            className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:opacity-60 text-brand-forest font-black py-4 rounded-2xl transition">
+            className="mikun-admin-primary w-full rounded-xl py-4 font-black text-white transition disabled:opacity-60">
             {loggingIn ? 'Checking...' : 'Login'}
           </button>
+          <p className="mikun-admin-demo-hint mt-5 text-center text-xs">Demo access: <code>mikun-demo</code></p>
         </div>
       </div>
     );
@@ -206,8 +279,32 @@ export default function Admin() {
 
   // ── Dashboard ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 md:pb-10 px-4 md:py-10 pt-10">
-      <div className="max-w-5xl mx-auto">
+    <div className="mikun-admin-shell min-h-screen pb-24 md:pb-0">
+      <aside className="mikun-admin-sidebar hidden md:flex">
+        <div className="mikun-admin-brand">
+          <img src={BRAND.logo} alt={BRAND.displayName} className="h-10 w-36 object-contain object-left" />
+          <span>ADMIN</span>
+        </div>
+        <p className="mikun-admin-section-label">Operations</p>
+        <div className="space-y-1">
+          {[{ id: 'orders', label: 'Dashboard', icon: '⌂' }, { id: 'orders', label: 'Orders', icon: '▣' }, { id: 'menu', label: 'Menu availability', icon: '♨' }, { id: 'reviews', label: 'Support', icon: '✉' }].map((item, index) => (
+            <button key={`${item.label}-${index}`} onClick={() => setTab(item.id)} className={`mikun-admin-side-link ${tab === item.id && (item.id !== 'orders' || index === 0) ? 'is-active' : ''}`}>
+              <span>{item.icon}</span>{item.label}
+            </button>
+          ))}
+        </div>
+        <p className="mikun-admin-section-label mt-7">Management</p>
+        <div className="space-y-1">
+          {['Menu management', 'Customers', 'Announcements', 'Finance', 'Settings'].map((label) => <button key={label} type="button" className="mikun-admin-side-link"><span>◈</span>{label}</button>)}
+        </div>
+        <div className="mikun-admin-sidebar-footer">
+          <button type="button" onClick={() => window.open('/', '_self')} className="mikun-admin-side-link"><span>⌂</span>View storefront</button>
+          <button type="button" onClick={logout} className="mikun-admin-side-link"><span>↪</span>Sign out</button>
+        </div>
+      </aside>
+
+      <div className="mikun-admin-main px-4 pt-10 md:px-8 md:py-8">
+      <div className="mx-auto max-w-6xl">
 
         {/* Desktop header */}
         <div className="hidden md:flex items-center justify-between mb-6">
@@ -218,7 +315,7 @@ export default function Admin() {
           <div className="flex gap-3">
             <button onClick={() => { fetchOrders(key); fetchReviews(key); fetchMenu(key); }}
               className="px-5 py-2 bg-brand-lime text-brand-forest rounded-full font-bold hover:bg-brand-lime-hover transition">Refresh</button>
-            <button onClick={() => { sessionStorage.removeItem('adminKey'); setKey(''); }}
+            <button onClick={logout}
               className="px-5 py-2 bg-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-300 transition">Logout</button>
           </div>
         </div>
@@ -229,13 +326,22 @@ export default function Admin() {
           <div className="flex gap-2">
             <button onClick={() => { fetchOrders(key); fetchReviews(key); fetchMenu(key); }}
               className="p-2 bg-brand-soft text-brand-forest rounded-full">↻</button>
-            <button onClick={() => { sessionStorage.removeItem('adminKey'); setKey(''); }}
+            <button onClick={logout}
               className="p-2 bg-gray-100 text-gray-600 rounded-full">✕</button>
           </div>
         </div>
 
+        <div className="mikun-admin-welcome mb-7">
+          <div>
+            <p className="mikun-admin-kicker">KITCHEN</p>
+            <h2>Welcome back, MIKUN</h2>
+            <p>Today in the kitchen, at a glance{isDemoMode ? ' · Demo workspace' : ''}.</p>
+          </div>
+          <span className="mikun-admin-live"><i /> LIVE</span>
+        </div>
+
         {/* Desktop tabs */}
-        <div className="hidden md:flex gap-2 mb-8 flex-wrap">
+        <div className="hidden">
           {[
             { id: 'orders', label: 'Orders', badge: orders.length },
             { id: 'reviews', label: 'Reviews', badge: pendingReviews.length, badgeLabel: 'pending' },
@@ -251,7 +357,22 @@ export default function Admin() {
 
         {/* ── ORDERS TAB ──────────────────────────────────────────────────── */}
         {tab === 'orders' && (
-          orders.length === 0
+          <>
+          <div className="mikun-admin-summary-grid mb-7">
+            {[
+              { label: 'Awaiting start', value: orders.filter((order) => order.status === 'Order Received').length, note: 'New orders', tone: 'amber' },
+              { label: 'In the kitchen', value: orders.filter((order) => order.status === 'Preparing').length, note: 'Being prepared', tone: 'rose' },
+              { label: 'Out for delivery', value: orders.filter((order) => order.status === 'Out for Delivery').length, note: 'On the way', tone: 'purple' },
+              { label: 'Completed today', value: orders.filter((order) => order.status === 'Delivered').length, note: 'Delivered today', tone: 'green' },
+            ].map((stat) => (
+              <div key={stat.label} className={`mikun-admin-summary-card is-${stat.tone}`}>
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+                <small>{stat.note}</small>
+              </div>
+            ))}
+          </div>
+          {orders.length === 0
             ? <div className="bg-white rounded-3xl p-16 text-center shadow"><p className="text-gray-500 text-lg">No confirmed orders yet.</p></div>
             : <div className="space-y-6">
                 {orders.map((order) => (
@@ -297,7 +418,8 @@ export default function Admin() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div>}
+          </>
         )}
 
         {/* ── REVIEWS TAB ─────────────────────────────────────────────────── */}
@@ -469,9 +591,10 @@ export default function Admin() {
           </div>
         )}
       </div>
+      </div>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+      <div className="mikun-admin-mobile-nav md:hidden fixed bottom-0 left-0 right-0 z-50">
         <div className="flex justify-around items-center max-w-md mx-auto">
           {[
             { id: 'orders', icon: '📋', label: 'Orders', badge: orders.length },

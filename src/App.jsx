@@ -5,6 +5,7 @@ import { menuDataNoImages } from './menuData.js';
 import { MENU_IMAGE_URLS as I } from './menuImageUrls.js';
 import Footer from './components/Footer.jsx';
 import HeroSection from './components/HeroSection.jsx';
+import MobileBottomNav from './components/MobileBottomNav.jsx';
 import { supabase } from './lib/supabase.js';
 import { BRAND } from './brand.js';
 
@@ -13,6 +14,24 @@ const RESTAURANT_LOCATION = BRAND.coordinates;
 const RESTAURANT_MAPS_QUERY = encodeURIComponent(BRAND.mapsQuery);
 const DELIVERY_RATE_PER_KM = 50;
 const MIN_DELIVERY_FEE = 50;
+const DEMO_USER = {
+  userId: 'mikun-demo-user',
+  name: 'Mikun Demo Customer',
+  email: 'demo@mikun.test',
+  phone: '0900 000 0000',
+};
+const DEMO_USER_PASSWORD = 'mikun-demo';
+const DEMO_APPROVED_REVIEWS = [
+  { id: 'demo-review-1', user_name: 'Kemi O.', rating: 5, comment: 'The food arrived hot and full of flavour. Good vibes indeed!', created_at: '2026-11-18T10:30:00.000Z' },
+  { id: 'demo-review-2', user_name: 'Tobi A.', rating: 5, comment: 'The jollof and chicken combo is now my go-to order in Ado Ekiti.', created_at: '2026-11-15T16:20:00.000Z' },
+  { id: 'demo-review-3', user_name: 'Dami F.', rating: 4, comment: 'Quick delivery, generous portions and a really friendly team.', created_at: '2026-11-12T13:05:00.000Z' },
+];
+const DEMO_ANNOUNCEMENTS = [
+  { id: 'demo-announcement-1', icon: '✦', message: 'Welcome to MIKUN — Good food, good vibe.' },
+  { id: 'demo-announcement-2', icon: '▣', message: 'Flat ₦500 delivery in Iworoko' },
+  { id: 'demo-announcement-3', icon: '✺', message: 'MIKUN10 — 10% off orders over ₦5,000' },
+  { id: 'demo-announcement-4', icon: '◆', message: 'Fresh plates are ready when you are' },
+];
 
 function calcPaystackFee(amount) {
   if (amount <= 0) return 0;
@@ -39,6 +58,7 @@ function calculateDeliveryFee(distanceKm) {
 }
 
 function App() {
+  const hasDemoUser = typeof window !== 'undefined' && localStorage.getItem('mikunDemoUser') === 'true';
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activePage, setActivePage] = useState('home');
@@ -77,11 +97,11 @@ function App() {
   const [deliveryDistanceKm, setDeliveryDistanceKm] = useState(null);
   const [deliveryFee, setDeliveryFee] = useState(MIN_DELIVERY_FEE);
   const [locationError, setLocationError] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState(() => hasDemoUser ? DEMO_USER.name : '');
+  const [customerEmail, setCustomerEmail] = useState(() => hasDemoUser ? DEMO_USER.email : '');
+  const [customerPhone, setCustomerPhone] = useState(() => hasDemoUser ? DEMO_USER.phone : '');
   const [authToken, setAuthToken] = useState('');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => hasDemoUser ? DEMO_USER : null);
   const [authMode, setAuthMode] = useState('login');
   const [authPassword, setAuthPassword] = useState('');
   const [authError, setAuthError] = useState('');
@@ -89,7 +109,8 @@ function App() {
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [menuItems, setMenuItems] = useState(menuDataNoImages);
-  const [approvedReviews, setApprovedReviews] = useState([]);
+  const [approvedReviews, setApprovedReviews] = useState(DEMO_APPROVED_REVIEWS);
+  const [announcements, setAnnouncements] = useState(DEMO_ANNOUNCEMENTS);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
@@ -238,6 +259,7 @@ function App() {
   useEffect(() => {
     loadMenuItems();
     loadApprovedReviews();
+    loadAnnouncements();
     if (!supabase) return undefined;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -421,7 +443,18 @@ function App() {
   };
 
   const logout = () => {
-    supabase.auth.signOut();
+    if (user?.userId === DEMO_USER.userId) {
+      localStorage.removeItem('mikunDemoUser');
+      setUser(null);
+      setAuthToken('');
+      setCustomerName('');
+      setCustomerEmail('');
+      setCustomerPhone('');
+      setAuthPassword('');
+      showToast('Logged out successfully');
+      return;
+    }
+    supabase?.auth.signOut();
     setAuthError('');
     showToast('Logged out successfully');
   };
@@ -432,6 +465,24 @@ function App() {
 
     if (!customerEmail.trim() || !authPassword) {
       setAuthError('Please enter email and password.');
+      return;
+    }
+
+    if (mode === 'login' && customerEmail.trim().toLowerCase() === DEMO_USER.email && authPassword === DEMO_USER_PASSWORD) {
+      localStorage.setItem('mikunDemoUser', 'true');
+      setUser(DEMO_USER);
+      setAuthToken('mikun-demo-token');
+      setCustomerName(DEMO_USER.name);
+      setCustomerEmail(DEMO_USER.email);
+      setCustomerPhone(DEMO_USER.phone);
+      setAuthPassword('');
+      setActivePage('profile');
+      showToast('Welcome to the demo account!');
+      return;
+    }
+
+    if (!supabase) {
+      setAuthError('Sign in is not configured yet. Please try again shortly.');
       return;
     }
 
@@ -468,8 +519,33 @@ function App() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setAuthError('');
+    setAuthStatusMessage('');
+    if (!supabase) {
+      setAuthError('Google sign in is not configured yet. Please try again shortly.');
+      return;
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) setAuthError(error.message);
+  };
+
   const saveProfile = async () => {
     if (!user) return;
+    if (user.userId === DEMO_USER.userId) {
+      const nextUser = { ...user, name: customerName, phone: customerPhone };
+      setUser(nextUser);
+      localStorage.setItem('mikunDemoUser', 'true');
+      showToast('Demo profile saved!');
+      return;
+    }
+    if (!supabase) {
+      showToast('Profile service is not configured yet.', 'error');
+      return;
+    }
     const { error } = await supabase.auth.updateUser({
       data: { name: customerName, phone: customerPhone },
     });
@@ -483,6 +559,7 @@ function App() {
 
   const forgotPassword = async () => {
     if (!customerEmail.trim()) { setAuthError('Please enter your email address.'); return; }
+    if (!supabase) { setAuthError('Password recovery is not configured yet.'); return; }
     setAuthError('');
     const { error } = await supabase.auth.resetPasswordForEmail(customerEmail.trim(), {
       redirectTo: window.location.origin,
@@ -531,7 +608,10 @@ function App() {
   };
 
   const loadApprovedReviews = async () => {
-    if (!supabase) return;
+    if (!supabase) {
+      setApprovedReviews(DEMO_APPROVED_REVIEWS);
+      return;
+    }
 
     const { data } = await supabase
       .from('reviews')
@@ -539,7 +619,22 @@ function App() {
       .eq('approved', true)
       .order('created_at', { ascending: false })
       .limit(20);
-    if (data) setApprovedReviews(data);
+    setApprovedReviews(data?.length ? data : DEMO_APPROVED_REVIEWS);
+  };
+
+  const loadAnnouncements = async () => {
+    if (!supabase) {
+      setAnnouncements(DEMO_ANNOUNCEMENTS);
+      return;
+    }
+
+    const { data } = await supabase
+      .from('announcements')
+      .select('id, message, icon, active, created_at')
+      .eq('active', true)
+      .order('created_at', { ascending: false })
+      .limit(8);
+    setAnnouncements(data?.length ? data : DEMO_ANNOUNCEMENTS);
   };
 
   const submitReview = async () => {
@@ -549,6 +644,20 @@ function App() {
     }
     if (!reviewComment.trim()) { showToast('Please write a comment', 'error'); return; }
     setReviewSubmitting(true);
+    if (user.userId === DEMO_USER.userId) {
+      setApprovedReviews((current) => [{
+        id: `demo-review-${Date.now()}`,
+        user_name: customerName || DEMO_USER.name,
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+        created_at: new Date().toISOString(),
+      }, ...current]);
+      setReviewSubmitting(false);
+      setReviewComment('');
+      setReviewRating(5);
+      showToast('Demo review published!');
+      return;
+    }
     const { error } = await supabase.from('reviews').insert({
       user_id: user.userId,
       user_name: customerName || customerEmail.split('@')[0],
@@ -688,7 +797,21 @@ function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {displayNavbar && (
-        <nav ref={navRef} className="mikun-nav fixed top-0 left-0 right-0 z-50 bg-[#173b35]/95 text-white backdrop-blur-md border-b border-white/10 shadow-sm">
+        <div className="mikun-announcement-ticker fixed left-0 right-0 top-0 z-[70]" role="status" aria-label="MIKUN announcements">
+          <div className="mikun-announcement-viewport">
+            <div className="mikun-announcement-track">
+              {[...(announcements.length ? announcements : DEMO_ANNOUNCEMENTS), ...(announcements.length ? announcements : DEMO_ANNOUNCEMENTS)].map((announcement, index) => (
+                <span key={`${announcement.id || announcement.message}-${index}`} className="mikun-announcement-item">
+                  <span className="mikun-announcement-icon" aria-hidden="true">{announcement.icon || '✦'}</span>
+                  {announcement.message}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {displayNavbar && (
+        <nav ref={navRef} className="mikun-nav fixed left-0 right-0 z-50 bg-[#173b35]/95 text-white backdrop-blur-md border-b border-white/10 shadow-sm">
           <div className="relative mx-auto flex h-16 w-full min-w-0 max-w-7xl items-center justify-between px-4 sm:px-6">
 
             {/* Logo */}
@@ -735,7 +858,7 @@ function App() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="absolute right-4 top-1/2 flex -translate-y-1/2 shrink-0 items-center gap-2 md:static md:ml-auto md:translate-y-0 md:hidden">
+            <div className="hidden">
               <button onClick={() => setActivePage('cart')}
                 className="flex items-center gap-1 bg-brand-lime text-brand-forest px-3 py-1.5 rounded-full text-sm font-black hover:bg-brand-lime-hover transition">
                 🛒 {cartCount > 0 && <span className="bg-white text-brand-forest rounded-full w-4 h-4 flex items-center justify-center text-xs font-black">{cartCount}</span>}
@@ -752,7 +875,7 @@ function App() {
           {/* Mobile Menu Dropdown */}
           {isMenuOpen && (
             <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-              className="md:hidden absolute top-full right-0 w-[60vw] max-w-xs min-h-[calc(100vh-4rem)] bg-white border border-gray-100 px-4 pb-4 shadow-lg rounded-bl-3xl rounded-tl-3xl">
+              className="md:hidden fixed bottom-20 right-3 z-[60] w-[min(86vw,340px)] max-h-[70vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white px-4 pb-4 shadow-2xl">
               {/* Mobile Search */}
               <div className="relative mt-3 mb-3">
                 <input type="text" placeholder="Search for food..."
@@ -788,7 +911,15 @@ function App() {
         </nav>
       )}
 
-      <main className={displayNavbar ? 'pt-16' : 'pt-0'}>
+      {displayNavbar && (
+        <MobileBottomNav
+          activePage={activePage}
+          cartCount={cartCount}
+          onNavigate={(page) => { setIsMenuOpen(false); setActivePage(page); }}
+        />
+      )}
+
+      <main className={displayNavbar ? 'pb-20 pt-24 md:pb-0' : 'pt-0'}>
         <HeroSection
           active={activePage === 'home'}
           heroRef={homeRef}
@@ -861,6 +992,12 @@ function App() {
               <p className="text-sm uppercase tracking-[0.4em] text-brand-forest font-bold">Reviews</p>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-4">What our customers say</h2>
               <p className="text-gray-500 mt-4 max-w-xl mx-auto">Real people, real orders, real satisfaction.</p>
+            </div>
+
+            <div className="mikun-review-stats mb-10 grid grid-cols-3 gap-3 rounded-3xl border border-brand-lime/20 bg-brand-lime/10 p-4 text-center sm:mx-auto sm:max-w-2xl sm:gap-8 sm:p-5">
+              <div><strong>4.9/5</strong><span>Average rating</span></div>
+              <div><strong>2,000+</strong><span>Happy customers</span></div>
+              <div><strong>15 min</strong><span>Average prep</span></div>
             </div>
 
             {/* Approved reviews grid */}
@@ -1291,23 +1428,60 @@ function App() {
           </div>
         </section>
 
-        <section className={activePage === 'profile' ? 'bg-gradient-to-br from-gray-50 to-white py-20' : 'hidden'}>
-          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <section className={activePage === 'profile' ? 'mikun-profile-page py-16 sm:py-20' : 'hidden'}>
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
             {/* Header */}
-            <div className="text-center mb-10">
+            <div className={`mikun-profile-heading mb-8 text-center sm:mb-10 ${!user ? 'hidden' : ''}`}>
               <p className="text-xs uppercase tracking-[0.3em] text-brand-forest font-bold">My Account</p>
               <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mt-3">Your Profile</h2>
             </div>
 
             {!user ? (
               /* Logged-out: centered auth card */
-              <div className="rounded-3xl bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-lg border border-gray-100">
-                <div className="flex items-center gap-3 mb-6">
+              <div className="mikun-auth-card rounded-3xl p-6 sm:p-10">
+                <div className="mikun-auth-switcher mb-8 grid grid-cols-2 rounded-full p-1">
+                  <button type="button" onClick={() => { setAuthMode('login'); setAuthError(''); setAuthStatusMessage(''); }} className={`rounded-full px-4 py-2.5 text-xs font-bold transition ${authMode === 'login' ? 'mikun-auth-switcher-active' : 'text-slate-500 hover:text-slate-800'}`}>Log in</button>
+                  <button type="button" onClick={() => { setAuthMode('register'); setAuthError(''); setAuthStatusMessage(''); }} className={`rounded-full px-4 py-2.5 text-xs font-bold transition ${authMode === 'register' ? 'mikun-auth-switcher-active' : 'text-slate-500 hover:text-slate-800'}`}>Sign up</button>
+                </div>
+                <div className="hidden">
                   <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-2xl">👤</div>
                   <h3 className="text-xl font-black text-gray-900">
                     {authMode === 'register' ? 'Create Account' : authMode === 'forgot' ? 'Reset Password' : 'Sign In'}
                   </h3>
                 </div>
+
+                <div className="mb-7">
+                  <p className="mikun-auth-kicker">{authMode === 'forgot' ? 'RESET YOUR PASSWORD' : authMode === 'register' ? 'CREATE YOUR ACCOUNT' : 'WELCOME BACK'}</p>
+                  <h3 className="mt-2 text-4xl font-black tracking-tight text-slate-950 sm:text-[2.65rem]">
+                    {authMode === 'register' ? "Let's get you started." : authMode === 'forgot' ? 'Reset your password.' : 'Welcome back.'}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{authMode === 'register' ? 'Create your account and start ordering your MIKUN favourites.' : authMode === 'forgot' ? 'Enter your email and we’ll send you a secure reset link.' : 'Log in to pick up where you left off.'}</p>
+                  {authMode === 'login' && <p className="mikun-demo-account-hint mt-3">Demo: demo@mikun.test · password: mikun-demo</p>}
+                </div>
+
+                {authMode !== 'forgot' && (
+                  <button
+                    type="button"
+                    onClick={signInWithGoogle}
+                    className="mikun-auth-google mb-5 flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 transition hover:-translate-y-0.5"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4">
+                      <path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.22Z" />
+                      <path fill="#34A853" d="M12 21.73c2.63 0 4.84-.87 6.45-2.35l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.73Z" />
+                      <path fill="#FBBC05" d="M6.54 13.82A5.85 5.85 0 0 1 6.24 12c0-.63.11-1.24.3-1.82V7.65H3.3A9.74 9.74 0 0 0 2.27 12c0 1.57.38 3.06 1.03 4.35l3.24-2.53Z" />
+                      <path fill="#EA4335" d="M12 6.15c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.25 14.63 2.27 12 2.27a9.74 9.74 0 0 0-8.7 5.38l3.24 2.53C7.31 7.87 9.46 6.15 12 6.15Z" />
+                    </svg>
+                    Continue with Google
+                  </button>
+                )}
+
+                {authMode !== 'forgot' && (
+                  <div className="mikun-auth-divider mb-5 flex items-center gap-3 text-[10px] text-slate-400">
+                    <span className="h-px flex-1 bg-slate-200" />
+                    <span>{authMode === 'register' ? 'or sign up with email' : 'or continue with email'}</span>
+                    <span className="h-px flex-1 bg-slate-200" />
+                  </div>
+                )}
 
                 {authMode === 'forgot' ? (
                   <div className="space-y-3">
@@ -1385,9 +1559,9 @@ function App() {
                     {authError && <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl">{authError}</p>}
                     <button
                       onClick={() => authenticate(authMode)}
-                      className="w-full mt-4 rounded-2xl bg-brand-lime text-brand-forest py-3 font-bold text-sm uppercase tracking-wide shadow-lg hover:bg-brand-lime-hover transition"
+                      className="mikun-auth-submit mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-black text-white transition hover:-translate-y-0.5"
                     >
-                      {authMode === 'register' ? 'Create Account' : 'Login'}
+                      {authMode === 'register' ? 'Create Account' : 'Log in'} <span aria-hidden="true">→</span>
                     </button>
                     <button
                       onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); setAuthStatusMessage(''); }}

@@ -2,8 +2,6 @@
 // Prefer local photos of the actual dishes; see IMAGE-CREDITS.md for source notes.
 export const MENU_IMAGE_URLS = {
   amala: '/images/amala.jpg',
-  semo: '/images/semo.jpg',
-  eba: '/images/Eba.jpg',
   fufu: '/images/Fufu.jpg',
   jollof: '/images/jollof-rice.jpg',
   jollofChicken: '/images/jollof-rice.jpg',
@@ -36,8 +34,6 @@ export const MENU_IMAGE_URLS = {
   sweetSourFish: '/images/fresh-fish.jpg',
   // Current MIKUN board items. These are local photographs so the cards keep
   // working even when a third-party image host is unavailable.
-  semoBeef: '/images/semo-real.jpg',
-  ebaBeef: '/images/eba-real.jpg',
   jollofFriedRiceBeef: '/images/jollof-fried-rice-beef.jpg',
   spagBeef: '/images/spaghetti-nigerian.jpg',
   poundedYam: '/images/pounded-yam-real.jpg',

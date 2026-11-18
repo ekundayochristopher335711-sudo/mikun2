@@ -10,8 +10,6 @@ export function calculatePaystackFee(amount) {
 
 // Authoritative server-side price list — never trust prices from the client
 export const MENU_PRICES = {
-  1: 1500, // Semo with Beef
-  2: 1500, // Eba with Beef
   3: 1700, // Small Plate of Jollof & Fried Rice with Beef
   4: 1700, // Spag with Beef
   5: 1700, // Pounded Yam per Plate

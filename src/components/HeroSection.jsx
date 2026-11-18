@@ -8,6 +8,8 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
   const pointerY = useMotionValue(0);
   const tiltX = useSpring(useTransform(pointerY, [-1, 1], [4, -4]), { stiffness: 100, damping: 18 });
   const tiltY = useSpring(useTransform(pointerX, [-1, 1], [-4, 4]), { stiffness: 100, damping: 18 });
+  const ambientX = useSpring(useTransform(pointerX, [-1, 1], [-18, 18]), { stiffness: 70, damping: 20 });
+  const ambientY = useSpring(useTransform(pointerY, [-1, 1], [-12, 12]), { stiffness: 70, damping: 20 });
 
   const handlePointerMove = (event) => {
     if (reduceMotion || event.pointerType === 'touch') return;
@@ -28,8 +30,13 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
   });
 
   return (
-    <section ref={heroRef} className={active ? 'mikun-hero relative overflow-hidden text-white' : 'hidden'}>
+    <section ref={heroRef} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} className={active ? 'mikun-hero relative overflow-hidden text-white' : 'hidden'}>
       <div className="mikun-hero-glow" aria-hidden="true" />
+      <motion.div className="mikun-hero-interactive-glow" aria-hidden="true" style={reduceMotion ? undefined : { x: ambientX, y: ambientY }} />
+      <div className="mikun-hero-grid-lines" aria-hidden="true" />
+      <div className="mikun-hero-sweep" aria-hidden="true" />
+      <div className="mikun-hero-star mikun-hero-star-one" aria-hidden="true" />
+      <div className="mikun-hero-star mikun-hero-star-two" aria-hidden="true" />
       <div className="mikun-hero-grid mx-auto grid max-w-7xl items-center gap-8 px-5 pb-10 pt-10 sm:px-8 sm:pb-14 sm:pt-14 lg:min-h-[650px] lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-14">
         <div className="mikun-hero-copy relative z-10 min-w-0 lg:order-2 lg:max-w-xl lg:justify-self-end">
           <motion.p {...reveal(0.1, 16)} className="text-xs font-bold uppercase tracking-[0.32em] text-brand-lime sm:text-sm">
@@ -72,10 +79,19 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
           </motion.div>
         </div>
 
-        <div className="mikun-hero-visual relative mx-auto w-full max-w-[600px] select-none lg:order-1 lg:justify-self-start" onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
+        <div className="mikun-hero-visual relative mx-auto w-full max-w-[600px] select-none lg:order-1 lg:justify-self-start">
           <div className="mikun-hero-orbit mikun-hero-orbit-one" aria-hidden="true" />
           <div className="mikun-hero-orbit mikun-hero-orbit-two" aria-hidden="true" />
+          <div className="mikun-hero-orbit mikun-hero-orbit-three" aria-hidden="true" />
           <div className="mikun-hero-orbit-dot" aria-hidden="true" />
+          <motion.div {...reveal(0.52, 18)} className="mikun-hero-float-card mikun-hero-float-card-left" aria-hidden="true">
+            <span className="mikun-hero-float-icon">✦</span>
+            <span><strong>Fresh today</strong><small>Made to order</small></span>
+          </motion.div>
+          <motion.div {...reveal(0.7, 18)} className="mikun-hero-float-card mikun-hero-float-card-right" aria-hidden="true">
+            <span className="mikun-hero-float-icon">₦</span>
+            <span><strong>From ₦1,500</strong><small>Big flavour, fair price</small></span>
+          </motion.div>
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, scale: 0.88, rotate: -6, y: 35 }}
             animate={{ opacity: 1, scale: 1, rotate: -3, y: 0 }}
@@ -94,6 +110,7 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
               />
             </div>
           </motion.div>
+          <motion.div className="mikun-hero-pulse-ring" aria-hidden="true" animate={reduceMotion ? undefined : { scale: [0.92, 1.08, 0.92], opacity: [0.16, 0.35, 0.16] }} transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }} />
           <motion.div {...reveal(0.75, 22)} className="mikun-hero-photo-caption absolute bottom-[5%] left-[2%] z-10 rounded-2xl border border-white/15 bg-brand-forest/90 px-4 py-3 text-white shadow-xl backdrop-blur-md sm:px-5 sm:py-4">
             <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-lime sm:text-xs">Today&apos;s favourite</span>
             <strong className="mikun-hero-caption-title mt-1 block text-lg sm:text-xl">Jollof, Chicken &amp; Plantain</strong>

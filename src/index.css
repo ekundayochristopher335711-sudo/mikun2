@@ -17,6 +17,7 @@ body {
   color: #17211d;
   font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -156,6 +157,47 @@ select {
   box-shadow: 0 10px 30px rgba(9, 42, 31, 0.16);
 }
 
+.mikun-announcement-ticker {
+  height: 2.15rem;
+  overflow: hidden;
+  border-top: 2px solid #b8ff3d;
+  background: #173b35;
+  color: #ffffff;
+}
+
+.mikun-announcement-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.mikun-announcement-track {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  height: 2.15rem;
+  animation: mikun-announcement-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.mikun-announcement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-right: 3.5rem;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.mikun-announcement-icon {
+  color: #b8ff3d;
+  font-size: 0.9rem;
+}
+
+.mikun-nav {
+  top: 2.15rem !important;
+}
+
 .mikun-hero {
   isolation: isolate;
 }
@@ -170,9 +212,13 @@ select {
 }
 
 .mikun-hero-copy {
-  background:
-    radial-gradient(circle at 90% 10%, rgba(184, 255, 61, 0.12), transparent 34%),
-    #173b35;
+  background: transparent;
+}
+
+.mikun-hero-glow,
+.mikun-hero-interactive-glow,
+.mikun-hero-grid-lines {
+  display: none;
 }
 
 .mikun-menu-band {
@@ -303,6 +349,24 @@ select {
   border-color: rgba(23, 59, 53, 0.1) !important;
   border-radius: 1.5rem !important;
   box-shadow: 0 16px 40px rgba(23, 59, 53, 0.07) !important;
+}
+
+.mikun-review-stats strong,
+.mikun-review-stats span {
+  display: block;
+}
+
+.mikun-review-stats strong {
+  color: #173b35;
+  font-size: clamp(1rem, 3vw, 1.45rem);
+  font-weight: 900;
+}
+
+.mikun-review-stats span {
+  margin-top: 0.2rem;
+  color: #587069;
+  font-size: 0.65rem;
+  font-weight: 700;
 }
 
 .mikun-menu-page {
@@ -579,6 +643,68 @@ select {
   animation: mikun-glow-breathe 7s ease-in-out infinite;
 }
 
+.mikun-hero-interactive-glow {
+  position: absolute;
+  z-index: -1;
+  top: 16%;
+  right: 28%;
+  width: min(40vw, 31rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 255, 61, 0.18), rgba(184, 255, 61, 0.04) 48%, transparent 72%);
+  filter: blur(2px);
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.mikun-hero-grid-lines {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.22;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+  pointer-events: none;
+}
+
+.mikun-hero-sweep {
+  position: absolute;
+  z-index: -1;
+  width: 28rem;
+  height: 28rem;
+  right: -10rem;
+  top: -13rem;
+  border-radius: 999px;
+  border: 1px solid rgba(75, 234, 0, 0.38);
+  box-shadow: 0 0 0 3rem rgba(75, 234, 0, 0.035), 0 0 0 8rem rgba(75, 234, 0, 0.02);
+  animation: mikun-sweep-drift 13s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.mikun-hero-star {
+  position: absolute;
+  z-index: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #4bea00;
+  box-shadow: 0 0 0 0.45rem rgba(75, 234, 0, 0.1), 0 0 1.25rem rgba(75, 234, 0, 0.62);
+  pointer-events: none;
+}
+
+.mikun-hero-star-one {
+  left: 8%;
+  top: 22%;
+  animation: mikun-star-drift 5.5s ease-in-out infinite;
+}
+
+.mikun-hero-star-two {
+  right: 8%;
+  bottom: 18%;
+  animation: mikun-star-drift 7.2s ease-in-out -1.5s infinite reverse;
+}
+
 .mikun-hero-title,
 .mikun-hero-caption-title,
 .mikun-hero-proof strong {
@@ -647,6 +773,14 @@ select {
   animation: mikun-orbit-spin-reverse 17s linear infinite;
 }
 
+.mikun-hero-orbit-three {
+  width: 116%;
+  aspect-ratio: 0.78;
+  opacity: 0.18;
+  border-style: dashed;
+  animation: mikun-orbit-spin 30s linear infinite reverse;
+}
+
 .mikun-hero-orbit-two::after {
   width: 7px;
   height: 7px;
@@ -665,8 +799,758 @@ select {
   animation: mikun-dot-pulse 3.2s ease-in-out infinite;
 }
 
+.mikun-hero-float-card {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(16, 47, 41, 0.86);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+  animation: mikun-card-float 5.6s ease-in-out infinite;
+}
+
+.mikun-hero-float-card-left { left: -1%; top: 18%; }
+.mikun-hero-float-card-right { right: -1%; bottom: 19%; animation-delay: -2.2s; }
+
+.mikun-hero-float-card strong,
+.mikun-hero-float-card small {
+  display: block;
+  white-space: nowrap;
+}
+
+.mikun-hero-float-card strong { color: #ffffff; font-size: 0.68rem; }
+.mikun-hero-float-card small { margin-top: 0.12rem; color: rgba(255, 255, 255, 0.62); font-size: 0.56rem; }
+
+.mikun-hero-float-icon {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  background: #b8ff3d;
+  color: #173b35;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.mikun-hero-pulse-ring {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 48%;
+  width: 103%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(184, 255, 61, 0.48);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
 .mikun-hero-badge {
   animation: mikun-badge-float 4.5s ease-in-out infinite;
+}
+
+/* Auth/profile surface: a quiet learning-app style shell that keeps the
+   restaurant brand in the teal action color while making the form feel light
+   and trustworthy. */
+.mikun-profile-page {
+  min-height: calc(100vh - 4rem);
+  background: #f6faf9;
+}
+
+.mikun-auth-card {
+  border: 1px solid #dce8e6;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 24px 70px rgba(18, 68, 64, 0.1);
+}
+
+.mikun-auth-switcher {
+  border: 1px solid #dce8e6;
+  background: #f2f7f6;
+}
+
+.mikun-auth-switcher-active {
+  color: #173b35;
+  background: #ffffff;
+  box-shadow: 0 2px 7px rgba(18, 68, 64, 0.16);
+}
+
+.mikun-auth-kicker {
+  color: #0e8d88;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.mikun-demo-account-hint {
+  color: #0e8d88;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.mikun-auth-card input {
+  border-color: #d5e3e1;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #17211d;
+  min-height: 2.8rem;
+}
+
+.mikun-auth-card input:focus {
+  border-color: #0eaaa3;
+  box-shadow: 0 0 0 3px rgba(14, 170, 163, 0.13);
+}
+
+.mikun-auth-card label > span:first-child,
+.mikun-auth-card label.text-xs,
+.mikun-auth-card label {
+  color: #163f3d;
+}
+
+.mikun-auth-google {
+  border: 1px solid #d5e3e1;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(18, 68, 64, 0.04);
+}
+
+.mikun-auth-submit {
+  background: #0e8d88;
+  box-shadow: 0 11px 24px rgba(14, 141, 136, 0.22);
+}
+
+.mikun-auth-submit:hover {
+  background: #08736f;
+}
+
+.mikun-auth-status {
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font-size: 0.72rem;
+}
+
+.mikun-auth-status-success {
+  color: #08736f;
+  background: #e7f7f4;
+}
+
+.mikun-auth-status-error {
+  color: #b42318;
+  background: #fff1f0;
+}
+
+.mikun-mobile-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+  bottom: 0;
+  z-index: 55;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  min-height: 4.65rem;
+  padding: 0.5rem 0.4rem calc(0.5rem + env(safe-area-inset-bottom));
+  border-top: 1px solid #dce8e6;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -15px 35px rgba(18, 68, 64, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.mikun-mobile-nav-item {
+  position: relative;
+  display: flex;
+  min-height: 3.55rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.22rem;
+  border-radius: 1rem;
+  color: #71817d;
+  font-size: 0.61rem;
+  font-weight: 800;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.mikun-mobile-nav-item svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.mikun-mobile-nav-item.is-active {
+  color: #0e8d88;
+}
+
+.mikun-mobile-nav-item:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.mikun-mobile-nav-primary {
+  margin-top: -1.35rem;
+  min-height: 4.25rem;
+  color: #173b35;
+}
+
+.mikun-mobile-nav-primary > span:first-child {
+  display: grid;
+  width: 3.6rem;
+  height: 3.6rem;
+  place-items: center;
+  border: 4px solid #ffffff;
+  border-radius: 999px;
+  background: #4bea00;
+  box-shadow: 0 12px 25px rgba(75, 234, 0, 0.3);
+}
+
+.mikun-mobile-nav-primary svg {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.mikun-mobile-nav-badge {
+  position: absolute;
+  right: -0.45rem;
+  top: -0.45rem;
+  display: grid;
+  width: 1.05rem;
+  height: 1.05rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #173b35;
+  color: #ffffff;
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+/* Admin workspace: dark plum shell with a single pink operational accent,
+   matching the supplied dashboard reference while keeping existing actions. */
+.mikun-admin-shell {
+  display: flex;
+  background: #100b10;
+  color: #f9f5f7;
+}
+
+.mikun-admin-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  width: 15.5rem;
+  min-height: 100vh;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 1.2rem 0.8rem 1rem;
+  background: #2a0d1e;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mikun-admin-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0.55rem 2rem;
+}
+
+.mikun-admin-brand span,
+.mikun-admin-kicker,
+.mikun-admin-section-label {
+  color: #d64a95;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.mikun-admin-section-label {
+  margin: 0 0.55rem 0.55rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mikun-admin-side-link {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: left;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.mikun-admin-side-link span {
+  width: 1rem;
+  color: #d64a95;
+  text-align: center;
+}
+
+.mikun-admin-side-link:hover,
+.mikun-admin-side-link.is-active {
+  color: #ffffff;
+  background: #d72b88;
+}
+
+.mikun-admin-side-link.is-active span {
+  color: #ffffff;
+}
+
+.mikun-admin-sidebar-footer {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mikun-admin-main {
+  min-width: 0;
+  flex: 1;
+  background: #100b10;
+}
+
+.mikun-admin-main .max-w-6xl {
+  max-width: 76rem;
+}
+
+.mikun-admin-main .hidden.md\:flex {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.mikun-admin-main .bg-white,
+.mikun-admin-main .bg-gray-50,
+.mikun-admin-main .bg-gray-100 {
+  background: #1d131a !important;
+}
+
+.mikun-admin-main .text-gray-900,
+.mikun-admin-main .text-gray-700,
+.mikun-admin-main .text-gray-600 {
+  color: #f5edf2 !important;
+}
+
+.mikun-admin-main .text-gray-500,
+.mikun-admin-main .text-gray-400 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.mikun-admin-main .border-gray-100,
+.mikun-admin-main .border-gray-200,
+.mikun-admin-main .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+.mikun-admin-main .bg-brand-lime {
+  background: #d72b88 !important;
+  color: #ffffff !important;
+}
+
+.mikun-admin-main .bg-brand-soft {
+  background: rgba(215, 43, 136, 0.16) !important;
+  color: #f4a7cb !important;
+}
+
+.mikun-admin-main .hover\:bg-brand-soft:hover,
+.mikun-admin-main .hover\:bg-brand-lime-hover:hover {
+  background: #b92070 !important;
+}
+
+.mikun-admin-welcome {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mikun-admin-welcome h2 {
+  margin-top: 0.35rem;
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  letter-spacing: -0.04em;
+}
+
+.mikun-admin-welcome p:last-child {
+  margin-top: 0.3rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+}
+
+.mikun-admin-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(75, 234, 0, 0.32);
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  color: #b8ff3d;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.mikun-admin-live i {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: #4bea00;
+  box-shadow: 0 0 0 0.25rem rgba(75, 234, 0, 0.1);
+}
+
+.mikun-admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.mikun-admin-summary-card {
+  min-height: 8.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #1d131a;
+}
+
+.mikun-admin-summary-card span,
+.mikun-admin-summary-card small {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mikun-admin-summary-card strong {
+  display: block;
+  margin-top: 0.55rem;
+  color: #ffffff;
+  font-size: 1.8rem;
+}
+
+.mikun-admin-summary-card small {
+  margin-top: 0.6rem;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.66rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.mikun-admin-summary-card.is-amber { border-color: rgba(239, 190, 49, 0.4); background: rgba(106, 79, 7, 0.28); }
+.mikun-admin-summary-card.is-rose { border-color: rgba(215, 43, 136, 0.32); }
+.mikun-admin-summary-card.is-purple { border-color: rgba(127, 92, 172, 0.34); }
+.mikun-admin-summary-card.is-green { border-color: rgba(75, 234, 0, 0.26); }
+
+.mikun-admin-login {
+  background: #100b10;
+}
+
+.mikun-admin-login-card {
+  border: 1px solid rgba(215, 43, 136, 0.25);
+  background: #1d131a;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
+}
+
+.mikun-admin-input {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.mikun-admin-input:focus {
+  border-color: #d72b88;
+  box-shadow: 0 0 0 3px rgba(215, 43, 136, 0.17);
+}
+
+.mikun-admin-primary {
+  background: #d72b88;
+  box-shadow: 0 12px 25px rgba(215, 43, 136, 0.22);
+}
+
+.mikun-admin-primary:hover {
+  background: #b92070;
+}
+
+.mikun-admin-mobile-nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2a0d1e;
+  box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.mikun-admin-mobile-nav button {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.mikun-admin-mobile-nav button.text-brand-forest {
+  color: #f4a7cb;
+  border-top-color: #d72b88;
+}
+
+/* Final Mikun admin palette: forest surfaces, lime actions, and warm light
+   workspace cards so operations stay readable at a glance. */
+.mikun-admin-shell {
+  background: #f4f9f1;
+  color: #173b35;
+}
+
+.mikun-admin-sidebar {
+  background: #173b35;
+  border-right-color: rgba(184, 255, 61, 0.16);
+}
+
+.mikun-admin-brand span,
+.mikun-admin-kicker,
+.mikun-admin-side-link span {
+  color: #b8ff3d;
+}
+
+.mikun-admin-section-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mikun-admin-side-link:hover,
+.mikun-admin-side-link.is-active {
+  color: #173b35;
+  background: #b8ff3d;
+}
+
+.mikun-admin-side-link.is-active span,
+.mikun-admin-side-link:hover span {
+  color: #173b35;
+}
+
+.mikun-admin-main {
+  background: #f4f9f1;
+}
+
+.mikun-admin-main .bg-white,
+.mikun-admin-main .bg-gray-50,
+.mikun-admin-main .bg-gray-100 {
+  background: #ffffff !important;
+}
+
+.mikun-admin-main .text-gray-900,
+.mikun-admin-main .text-gray-700,
+.mikun-admin-main .text-gray-600 {
+  color: #173b35 !important;
+}
+
+.mikun-admin-main .text-gray-500,
+.mikun-admin-main .text-gray-400 {
+  color: #678078 !important;
+}
+
+.mikun-admin-main .border-gray-100,
+.mikun-admin-main .border-gray-200,
+.mikun-admin-main .border-gray-300 {
+  border-color: rgba(23, 59, 53, 0.12) !important;
+}
+
+.mikun-admin-main .bg-brand-lime {
+  background: #b8ff3d !important;
+  color: #173b35 !important;
+}
+
+.mikun-admin-main .bg-brand-soft {
+  background: #e8ffd3 !important;
+  color: #173b35 !important;
+}
+
+.mikun-admin-main .hover\:bg-brand-soft:hover,
+.mikun-admin-main .hover\:bg-brand-lime-hover:hover {
+  background: #d5ff9c !important;
+}
+
+.mikun-admin-welcome h2 {
+  color: #173b35;
+}
+
+.mikun-admin-welcome p:last-child {
+  color: #678078;
+}
+
+.mikun-admin-live {
+  border-color: rgba(22, 138, 45, 0.26);
+  color: #168a2d;
+}
+
+.mikun-admin-live i {
+  background: #21b83a;
+  box-shadow: 0 0 0 0.25rem rgba(33, 184, 58, 0.12);
+}
+
+.mikun-admin-summary-card {
+  border-color: rgba(23, 59, 53, 0.12);
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(23, 59, 53, 0.07);
+}
+
+.mikun-admin-summary-card span,
+.mikun-admin-summary-card small {
+  color: #678078;
+}
+
+.mikun-admin-summary-card strong {
+  color: #173b35;
+}
+
+.mikun-admin-summary-card small {
+  color: #8a9b95;
+}
+
+.mikun-admin-summary-card.is-amber { border-color: rgba(239, 190, 49, 0.46); background: #fffdf2; }
+.mikun-admin-summary-card.is-rose { border-color: rgba(14, 141, 136, 0.25); background: #f2fbfa; }
+.mikun-admin-summary-card.is-purple { border-color: rgba(119, 93, 171, 0.25); background: #faf8ff; }
+.mikun-admin-summary-card.is-green { border-color: rgba(33, 184, 58, 0.26); background: #f5fff1; }
+
+.mikun-admin-mobile-nav {
+  border-top-color: rgba(23, 59, 53, 0.12);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -15px 35px rgba(23, 59, 53, 0.14);
+}
+
+.mikun-admin-mobile-nav button {
+  color: #678078;
+}
+
+.mikun-admin-mobile-nav button.text-brand-forest {
+  color: #168a2d;
+  border-top-color: #b8ff3d;
+}
+
+.mikun-admin-login {
+  background: #102f29;
+}
+
+.mikun-admin-login-card {
+  border-color: rgba(184, 255, 61, 0.24);
+  background: #173b35;
+}
+
+.mikun-admin-input {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.mikun-admin-input:focus {
+  border-color: #b8ff3d;
+  box-shadow: 0 0 0 3px rgba(184, 255, 61, 0.18);
+}
+
+.mikun-admin-primary {
+  background: #b8ff3d;
+  color: #173b35;
+  box-shadow: 0 12px 25px rgba(184, 255, 61, 0.2);
+}
+
+.mikun-admin-primary:hover {
+  background: #d5ff9c;
+}
+
+.mikun-admin-demo-hint {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.mikun-admin-demo-hint code {
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.35rem;
+  background: rgba(184, 255, 61, 0.13);
+  color: #b8ff3d;
+  font-weight: 800;
+}
+
+/* Mobile storefront bar follows the supplied five-action layout while using
+   Mikun's mint/lime accent instead of the reference pink. */
+.mikun-mobile-nav {
+  min-height: 5.25rem;
+  gap: 0.2rem;
+  padding: 0.55rem 0.65rem calc(0.55rem + env(safe-area-inset-bottom));
+  border-top-color: rgba(23, 59, 53, 0.08);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -12px 28px rgba(23, 59, 53, 0.1);
+}
+
+.mikun-mobile-nav-item {
+  min-height: 4.15rem;
+  gap: 0.28rem;
+  border-radius: 1.2rem;
+  color: #7c8984;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.mikun-mobile-nav-item > span:first-child {
+  display: grid;
+  width: 3.2rem;
+  height: 2.55rem;
+  place-items: center;
+  border-radius: 1.15rem;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.mikun-mobile-nav-item.is-active {
+  color: #168a2d;
+}
+
+.mikun-mobile-nav-item.is-active > span:first-child {
+  background: #e8ffd3;
+  color: #168a2d;
+}
+
+.mikun-mobile-nav-item:active > span:first-child {
+  transform: scale(0.94);
+}
+
+.mikun-mobile-nav-primary {
+  margin-top: 0;
+  min-height: 4.15rem;
+  color: #7c8984;
+}
+
+.mikun-mobile-nav-primary > span:first-child {
+  width: 3.2rem;
+  height: 2.55rem;
+  border: 0;
+  border-radius: 1.15rem;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mikun-mobile-nav-primary svg {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.mikun-mobile-nav-badge {
+  right: 0.18rem;
+  top: -0.15rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  background: #173b35;
+  color: #b8ff3d;
+}
+
+@media (max-width: 767px) {
+  .mikun-admin-shell {
+    display: block;
+  }
+
+  .mikun-admin-welcome {
+    padding-top: 2.5rem;
+  }
+
+  .mikun-admin-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mikun-admin-main {
+    min-height: 100vh;
+  }
 }
 
 .mikun-hero-proof > div {
@@ -701,6 +1585,11 @@ select {
   50% { transform: translateY(-14px); }
 }
 
+@keyframes mikun-announcement-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
 @keyframes mikun-photo-zoom {
   from { transform: scale(1.04); }
   to { transform: scale(1.1); }
@@ -721,6 +1610,16 @@ select {
   50% { opacity: 1; transform: translateY(-50%) scale(1.12); }
 }
 
+@keyframes mikun-sweep-drift {
+  from { transform: translate3d(0, 0, 0) rotate(-8deg); }
+  to { transform: translate3d(-5rem, 4rem, 0) rotate(14deg); }
+}
+
+@keyframes mikun-star-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.8); opacity: 0.55; }
+  50% { transform: translate3d(1.4rem, -1.2rem, 0) scale(1.2); opacity: 1; }
+}
+
 @keyframes mikun-dot-pulse {
   0%, 100% { opacity: 0.65; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1.2); }
@@ -731,21 +1630,81 @@ select {
   50% { transform: translateY(-12px) rotate(-5deg); }
 }
 
+@keyframes mikun-card-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-9px) rotate(1deg); }
+}
+
 @media (max-width: 640px) {
-  .mikun-hero-visual { min-height: 290px; }
+  .mikun-hero-grid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .mikun-hero-copy,
+  .mikun-hero-visual,
+  .mikun-hero-proof {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .mikun-hero-copy > p,
+  .mikun-hero-proof > div {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+
+  .mikun-hero-proof strong,
+  .mikun-hero-proof span {
+    white-space: normal;
+  }
+
+  .mikun-hero-visual { min-height: 290px; overflow: visible; }
   .mikun-hero-photo-shell { width: 82%; }
   .mikun-hero-photo-float { border-radius: 2rem; }
   .mikun-hero-proof strong { font-size: 14px; }
   .mikun-hero-proof span { font-size: 10px; }
+
+  .mikun-mobile-nav {
+    left: 0;
+    right: auto;
+    width: 100vw;
+    max-width: 100vw;
+    overflow: visible;
+  }
+
+  .mikun-mobile-nav-item {
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .mikun-mobile-nav-item > span:last-child {
+    white-space: nowrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .mikun-announcement-track {
+    animation: none;
+  }
+
   .mikun-hero-glow,
   .mikun-hero-photo-float,
   .mikun-hero-photo,
   .mikun-hero-orbit,
   .mikun-hero-orbit-dot,
-  .mikun-hero-badge {
+  .mikun-hero-pulse-ring,
+  .mikun-hero-float-card,
+  .mikun-hero-badge,
+  .mikun-hero-sweep,
+  .mikun-hero-star {
     animation: none;
   }
 }

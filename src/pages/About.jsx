@@ -21,7 +21,7 @@ const About = () => {
           <div className="bg-gray-50 p-8 rounded-lg">
             <h3 className="text-3xl font-bold text-gray-800 mb-4">Our Story</h3>
             <p className="text-gray-600 text-lg leading-relaxed mb-4">
-              MIKUN brings comforting favourites and an easygoing spirit together. From semo and eba to jollof,
+              MIKUN brings comforting favourites and an easygoing spirit together. From local favourites to jollof,
               proteins and a cold drink, our menu gives everyone something to look forward to.
             </p>
             <p className="text-gray-600 text-lg leading-relaxed">
