@@ -30,8 +30,8 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
   return (
     <section ref={heroRef} className={active ? 'mikun-hero relative overflow-hidden text-white' : 'hidden'}>
       <div className="mikun-hero-glow" aria-hidden="true" />
-      <div className="mikun-hero-grid mx-auto grid max-w-7xl items-center gap-8 px-5 pb-10 pt-10 sm:px-8 sm:pb-14 sm:pt-14 lg:min-h-[650px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12 lg:px-12 lg:py-14">
-        <div className="mikun-hero-copy relative z-10 min-w-0 lg:order-2">
+      <div className="mikun-hero-grid mx-auto grid max-w-7xl items-center gap-8 px-5 pb-10 pt-10 sm:px-8 sm:pb-14 sm:pt-14 lg:min-h-[650px] lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-14">
+        <div className="mikun-hero-copy relative z-10 min-w-0 lg:order-2 lg:max-w-xl lg:justify-self-end">
           <motion.p {...reveal(0.1, 16)} className="text-xs font-bold uppercase tracking-[0.32em] text-brand-lime sm:text-sm">
             MIKUN / ADO EKITI
           </motion.p>
@@ -72,7 +72,7 @@ function HeroSection({ active, heroRef, onOrder, onMenu, children }) {
           </motion.div>
         </div>
 
-        <div className="mikun-hero-visual relative mx-auto w-full max-w-[640px] select-none lg:order-1" onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
+        <div className="mikun-hero-visual relative mx-auto w-full max-w-[600px] select-none lg:order-1 lg:justify-self-start" onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
           <div className="mikun-hero-orbit mikun-hero-orbit-one" aria-hidden="true" />
           <div className="mikun-hero-orbit mikun-hero-orbit-two" aria-hidden="true" />
           <div className="mikun-hero-orbit-dot" aria-hidden="true" />

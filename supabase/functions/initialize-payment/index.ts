@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
-import { calculateDeliveryFee, DELIVERY_FEE, calculatePaystackFee } from '../_shared/menuPrices.ts';
+import { calculateDeliveryFee, DELIVERY_FEE, calculatePaystackFee, MENU_PRICES } from '../_shared/menuPrices.ts';
 
 const MAX_ORDER_AMOUNT = 500000;
 const OWNER_EMAIL = Deno.env.get('OWNER_EMAIL') || '';
@@ -30,10 +30,13 @@ Deno.serve(async (req: Request) => {
     // Fetch authoritative prices from database
     const supabaseForPrices = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     const { data: dbItems } = await supabaseForPrices.from('menu_items').select('id, price');
-    const MENU_PRICES: Record<number, number> = {};
-    (dbItems || []).forEach((i: any) => { MENU_PRICES[i.id] = i.price; });
+    const remotePrices: Record<number, number> = {};
+    (dbItems || []).forEach((i: any) => { remotePrices[Number(i.id)] = Number(i.price); });
+    const remoteCatalogIsCurrent = Object.keys(MENU_PRICES).length === Object.keys(remotePrices).length
+      && Object.entries(MENU_PRICES).every(([id, price]) => remotePrices[Number(id)] === price);
+    const authoritativePrices = remoteCatalogIsCurrent ? remotePrices : MENU_PRICES;
 
-    const subtotal = (items as any[]).reduce((sum: number, item: any) => sum + (MENU_PRICES[item.id] ?? 0) * (item.quantity || 1), 0);
+    const subtotal = (items as any[]).reduce((sum: number, item: any) => sum + (authoritativePrices[Number(item.id)] ?? 0) * (item.quantity || 1), 0);
     const withDelivery = subtotal + computedDeliveryFee;
     const amount = withDelivery + calculatePaystackFee(withDelivery);
 

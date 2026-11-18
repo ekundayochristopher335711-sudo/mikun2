@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BRAND } from '../brand.js';
+import { menuDataNoImages } from '../menuData.js';
 
 const API = import.meta.env.VITE_API_URL || '';
 const STATUSES = ['Order Received', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'];
-const CATEGORIES = ['Swallow', 'Rice Meals', 'Special Orders', 'Xmas Combo', 'Wraps and goodies', 'Protein and sides'];
+const CATEGORIES = ['Dishes', 'Proteins', 'Drinks'];
 
-const BLANK_FORM = { name: '', description: '', price: '', category: 'Rice Meals', image_url: '' };
+const BLANK_FORM = { name: '', description: '', price: '', category: 'Dishes', image_url: '' };
 
 export default function Admin() {
   const [key, setKey] = useState(() => sessionStorage.getItem('adminKey') || '');
@@ -54,7 +55,22 @@ export default function Admin() {
     setMenuLoading(true);
     try {
       const res = await fetch(`${API}/admin-menu`, { headers: { 'x-admin-key': adminKey } });
-      if (res.ok) setMenuItems(await res.json());
+      if (res.ok) {
+        const remoteItems = await res.json();
+        const remoteMatchesCatalog = remoteItems.length === menuDataNoImages.length && remoteItems.every(item => {
+          const local = menuDataNoImages.find(menuItem => menuItem.id === item.id);
+          return local && local.name === item.name && Number(item.price) === local.price;
+        });
+        setMenuItems(remoteMatchesCatalog ? remoteItems : menuDataNoImages.map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.desc,
+          price: item.price,
+          category: item.category,
+          available: item.available,
+          image_url: item.image,
+        })));
+      }
     } catch { /* silent */ }
     setMenuLoading(false);
   }, []);

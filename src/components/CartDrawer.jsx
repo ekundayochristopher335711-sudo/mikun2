@@ -17,7 +17,7 @@ const CartDrawer = ({ isOpen, cartItems, onClose, onRemove, onCheckout }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-40 transform transition-transform duration-300 ${
+        className={`mikun-cart-drawer fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-40 transform transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } overflow-y-auto`}
       >

@@ -48,7 +48,18 @@ function App() {
   const [cart, setCart] = useState(() => {
     try {
       const raw = localStorage.getItem('cart');
-      return raw ? JSON.parse(raw) : [];
+      const savedCart = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(savedCart)) return [];
+
+      // Rehydrate saved lines from the current board catalog so an older cart
+      // cannot keep stale names or prices after the menu is updated.
+      const localById = new Map(menuDataNoImages.map(item => [item.id, item]));
+      return savedCart.flatMap((savedItem) => {
+        const currentItem = localById.get(Number(savedItem?.id));
+        if (!currentItem) return [];
+        const quantity = Math.max(1, Number(savedItem?.quantity) || 1);
+        return [{ ...currentItem, quantity }];
+      });
     } catch {
       return [];
     }
@@ -295,7 +306,7 @@ function App() {
   }, [user]);
 
   const topItems = useMemo(() => {
-    const preferredIds = [22, 23, 7, 5, 15, 13, 20];
+    const preferredIds = [9, 10, 3, 14, 17, 20, 21];
     const preferredItems = preferredIds
       .map(id => menuItems.find(item => item.id === id))
       .filter(Boolean);
@@ -497,17 +508,26 @@ function App() {
     if (!supabase) return;
 
     const { data } = await supabase.from('menu_items').select('*').order('id');
-    if (data && data.length > 0) {
-      setMenuItems(data.map(item => ({
-        id: item.id,
-        name: item.name,
-        desc: item.description || '',
-        price: item.price,
-        category: item.category,
-        available: item.available,
-        image: item.image_url || '',
-      })));
-    }
+    if (!data || data.length === 0) return;
+
+    // Keep the supplied MIKUN board as the source of truth until the remote
+    // catalog has been deliberately synced. This prevents an older Supabase
+    // menu from silently bringing back the previous dishes and prices.
+    const localById = new Map(menuDataNoImages.map(item => [item.id, item]));
+    const remoteMatchesCatalog = data.length === menuDataNoImages.length && data.every(item => {
+      const local = localById.get(item.id);
+      return local && local.name === item.name && Number(item.price) === local.price;
+    });
+    if (!remoteMatchesCatalog) return;
+
+    setMenuItems(data.map(item => {
+      const local = localById.get(item.id);
+      return {
+        ...local,
+        available: item.available ?? local.available,
+        image: item.image_url || local.image,
+      };
+    }));
   };
 
   const loadApprovedReviews = async () => {
@@ -668,7 +688,7 @@ function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       {displayNavbar && (
-        <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 bg-[#173b35]/95 text-white backdrop-blur-md border-b border-white/10 shadow-sm">
+        <nav ref={navRef} className="mikun-nav fixed top-0 left-0 right-0 z-50 bg-[#173b35]/95 text-white backdrop-blur-md border-b border-white/10 shadow-sm">
           <div className="relative mx-auto flex h-16 w-full min-w-0 max-w-7xl items-center justify-between px-4 sm:px-6">
 
             {/* Logo */}
@@ -793,16 +813,16 @@ function App() {
           )}
         </HeroSection>
 
-        <section className={activePage === 'home' ? 'bg-[#fffaf5] py-8 sm:py-12' : 'hidden'}>
+        <section className={activePage === 'home' ? 'mikun-menu-band bg-[#fffaf5] py-8 sm:py-12' : 'hidden'}>
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
               <div><p className="text-xs font-bold uppercase text-brand-forest">What are you craving?</p><h2 className="mt-1 text-3xl font-black text-gray-900 sm:text-4xl">Explore Our Menu</h2></div>
               <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
                 {[
                   { label: 'All', value: 'All' },
-                  { label: 'Wraps', value: 'Wraps and goodies' },
-                  { label: 'Rice', value: 'Rice Meals' },
-                  { label: 'Specials', value: 'Special Orders' },
+                  { label: 'Dishes', value: 'Dishes' },
+                  { label: 'Proteins', value: 'Proteins' },
+                  { label: 'Drinks', value: 'Drinks' },
                 ].map(category => (
                   <button key={category.value} onClick={() => { setSelectedCategory(category.value); setActivePage('menu'); }} className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${selectedCategory === category.value ? 'bg-brand-lime text-brand-forest' : 'bg-white text-gray-700 shadow-sm hover:text-brand-forest'}`}>{category.label}</button>
                 ))}
@@ -820,8 +840,8 @@ function App() {
             </div>
 
             <div className="mt-7 grid overflow-hidden rounded-xl bg-[#176b2b] text-white sm:grid-cols-[1.1fr_0.9fr]">
-              <div className="flex flex-col items-start justify-center p-6 sm:p-8"><p className="font-semibold italic text-lime-100">Good Food. Good Vibe.</p><p className="mt-1 text-xs font-bold uppercase text-lime-100">Combo Deal</p><h3 className="mt-1 text-3xl font-black sm:text-4xl">Rice, Chicken & Drink</h3><p className="mt-1 text-2xl font-black">₦7,500</p><button onClick={() => { setSelectedCategory('Xmas Combo'); setActivePage('menu'); }} className="mt-4 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-forest transition hover:bg-green-50">Order Combo <span aria-hidden="true">→</span></button></div>
-              <img src={I.riceChickenCombo} alt="Rice, chicken and a drink combo" className="h-48 w-full object-cover sm:h-full sm:min-h-56" referrerPolicy="no-referrer" />
+              <div className="flex flex-col items-start justify-center p-6 sm:p-8"><p className="font-semibold italic text-lime-100">Good Food. Good Vibe.</p><p className="mt-1 text-xs font-bold uppercase text-lime-100">Popular plate</p><h3 className="mt-1 text-3xl font-black sm:text-4xl">Jollof &amp; Fried Rice with Beef</h3><p className="mt-1 text-2xl font-black">₦2,200</p><button onClick={() => { setSelectedCategory('Dishes'); setActivePage('menu'); }} className="mt-4 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-forest transition hover:bg-green-50">Order plate <span aria-hidden="true">→</span></button></div>
+              <img src={I.jollofFriedRiceBeef} alt="Jollof and fried rice with beef" className="h-48 w-full object-cover sm:h-full sm:min-h-56" referrerPolicy="no-referrer" />
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-5 border-y border-gray-200 py-6 text-center sm:grid-cols-4">
@@ -835,7 +855,7 @@ function App() {
           </div>
         </section>
 
-        <section className={activePage === 'home' ? 'bg-gray-50 py-20' : 'hidden'}>
+        <section className={activePage === 'home' ? 'mikun-reviews bg-gray-50 py-20' : 'hidden'}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12">
               <p className="text-sm uppercase tracking-[0.4em] text-brand-forest font-bold">Reviews</p>
@@ -918,11 +938,11 @@ function App() {
           </div>
         </section>
 
-        <section ref={menuRef} className={activePage === 'menu' ? 'max-w-7xl mx-auto px-6 py-10 sm:py-20' : 'hidden'}>
+        <section ref={menuRef} className={activePage === 'menu' ? 'mikun-menu-page max-w-7xl mx-auto px-6 py-10 sm:py-20' : 'hidden'}>
           <div className="text-center mb-7 sm:mb-12">
             <p className="text-sm uppercase tracking-[0.4em] text-brand-forest font-bold">Menu</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-3 sm:mt-4">Choose your favorite Nigerian dishes</h2>
-            <p className="text-gray-600 mt-4 max-w-2xl mx-auto">From rich Jollof to hearty Egusi, add items to your cart and checkout from one page.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-3 sm:mt-4">Choose your plate</h2>
+            <p className="text-gray-600 mt-4 max-w-2xl mx-auto">Pick from the MIKUN dishes, proteins and drinks on today&apos;s menu, then add your order to the tray.</p>
           </div>
           <div className="-mx-6 mb-6 flex gap-2 overflow-x-auto px-6 pb-2 sm:mx-0 sm:mb-10 sm:flex-wrap sm:justify-center sm:gap-3 sm:px-0">
             {categories.map((category) => (
@@ -981,7 +1001,7 @@ function App() {
           </div>
         </section>
 
-        <section className={activePage === 'cart' ? 'bg-gray-50 py-16' : 'hidden'}>
+        <section className={activePage === 'cart' ? 'mikun-cart-page bg-gray-50 py-16' : 'hidden'}>
           <div className="max-w-7xl mx-auto px-6">
             <h3 className="text-4xl font-black text-brand-forest mb-12">Your Tray</h3>
             {cart.length === 0 ? (
@@ -1561,7 +1581,7 @@ function App() {
           </div>
         </section>
 
-        <section ref={locationRef} className={activePage === 'location' ? 'max-w-7xl mx-auto px-6 py-20' : 'hidden'}>
+        <section ref={locationRef} className={activePage === 'location' ? 'mikun-location max-w-7xl mx-auto px-6 py-20' : 'hidden'}>
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-[0.4em] text-brand-forest font-bold">Location</p>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-4">Find Us</h2>

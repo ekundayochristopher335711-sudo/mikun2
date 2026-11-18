@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-lime': '#4BEA00',
-        'brand-lime-hover': '#39C900',
+        'brand-lime': '#B8FF3D',
+        'brand-lime-hover': '#9CE62B',
         'brand-forest': '#173B35',
         'brand-soft': '#E8FFDF',
         'brand-soft-hover': '#D7FFCA',

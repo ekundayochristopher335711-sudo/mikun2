@@ -38,7 +38,7 @@ const SOCIAL = [
 
 const Footer = () => {
   return (
-    <footer className="bg-[#151515] text-white py-16">
+    <footer className="mikun-footer bg-[#151515] text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Top row */}
@@ -145,8 +145,8 @@ const Footer = () => {
             <div className="space-y-2 text-xs leading-relaxed text-gray-500">
               <p>&copy; {new Date().getFullYear()} {BRAND.displayName}. All rights reserved.</p>
               <p>
-                Photo: Jide Charles (Jidus),{' '}
-                <a href="https://commons.wikimedia.org/wiki/File:Jollof_rice,_plantain,_bean_porridge_and_turkey.jpg" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">Wikimedia Commons</a>,{' '}
+                Photo: Zahraswaty,{' '}
+                <a href="https://commons.wikimedia.org/wiki/File:Rice_and_beans_food_in_Northern_Nigeria.jpg" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">Rice and beans photo on Wikimedia Commons</a>,{' '}
                 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">CC BY-SA 4.0</a> (unmodified).
               </p>
             </div>

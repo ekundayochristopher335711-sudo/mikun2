@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,15 +12,29 @@
 
 html,
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #FFFFFF;
-  color: #111111;
-  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  background-color: #fffaf5;
+  color: #17211d;
+  font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: 'Barlow Condensed', 'DM Sans', sans-serif;
   font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: #b8ff3d;
+  color: #173b35;
 }
 
 /* Custom scrollbar */
@@ -103,6 +117,331 @@ h1, h2, h3, h4, h5, h6 {
     rgba(75, 234, 0, 0.18) 0%,
     rgba(57, 201, 0, 0.1) 50%,
     rgba(255, 255, 255, 0.1) 100%);
+}
+
+/* MIKUN visual system: the legacy orange utility names remain in markup for
+   compatibility, but render as the new green/lime brand palette. */
+.text-orange-100 { color: #efffd2 !important; }
+.text-orange-200 { color: #d9ff85 !important; }
+.text-orange-300 { color: #b8ff3d !important; }
+.text-orange-400,
+.text-orange-500,
+.text-orange-600,
+.text-orange-700 { color: #21b83a !important; }
+.bg-orange-50 { background-color: #f1ffdf !important; }
+.bg-orange-100 { background-color: #e6ffc4 !important; }
+.bg-orange-200 { background-color: #d5ff9c !important; }
+.bg-orange-500 { background-color: #21b83a !important; }
+.bg-orange-600 { background-color: #168a2d !important; }
+.border-orange-200 { border-color: #b8ff3d !important; }
+.border-orange-300 { border-color: #8be61e !important; }
+.border-orange-500 { border-color: #21b83a !important; }
+.hover\:bg-orange-50:hover { background-color: #f1ffdf !important; }
+.hover\:bg-orange-100:hover { background-color: #e6ffc4 !important; }
+.hover\:bg-orange-200:hover { background-color: #d5ff9c !important; }
+.hover\:bg-orange-600:hover { background-color: #168a2d !important; }
+.hover\:text-orange-700:hover,
+.hover\:text-orange-500:hover { color: #168a2d !important; }
+
+/* Compatibility aliases for the legacy page components that still use the
+   old item-red token. They now resolve to MIKUN's forest/lime system too. */
+.text-item-red { color: #173b35 !important; }
+.bg-item-red { background-color: #173b35 !important; }
+.text-item-dark-red { color: #102f29 !important; }
+.bg-item-dark-red { background-color: #102f29 !important; }
+.hover\:bg-item-dark-red:hover { background-color: #102f29 !important; }
+.focus\:border-item-red:focus { border-color: #b8ff3d !important; }
+
+.mikun-nav {
+  box-shadow: 0 10px 30px rgba(9, 42, 31, 0.16);
+}
+
+.mikun-hero {
+  isolation: isolate;
+}
+
+.mikun-hero-media img {
+  transform: scale(1.01);
+  transition: transform 700ms ease;
+}
+
+.mikun-hero-media:hover img {
+  transform: scale(1.04);
+}
+
+.mikun-hero-copy {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(184, 255, 61, 0.12), transparent 34%),
+    #173b35;
+}
+
+.mikun-menu-band {
+  background: #fffaf5;
+}
+
+.mikun-menu-band article {
+  border-color: rgba(23, 59, 53, 0.12);
+  box-shadow: 0 12px 32px rgba(23, 59, 53, 0.07);
+}
+
+.mikun-menu-band article:hover {
+  box-shadow: 0 18px 40px rgba(23, 59, 53, 0.14);
+}
+
+.mikun-location {
+  background: #f1ffdf;
+}
+
+.mikun-footer {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(184, 255, 61, 0.1), transparent 30%),
+    #102f29;
+}
+
+/* The rest of the site uses the same editorial rhythm as the hero: generous
+   white space, warm surfaces, rounded cards, and lime actions that read as
+   one clear path to ordering. */
+.mikun-nav {
+  background: rgba(23, 59, 53, 0.96) !important;
+  border-bottom-color: rgba(184, 255, 61, 0.18) !important;
+}
+
+.mikun-nav input {
+  border-color: rgba(23, 59, 53, 0.14);
+  box-shadow: 0 8px 24px rgba(8, 35, 27, 0.08);
+}
+
+.mikun-nav input:focus {
+  border-color: #b8ff3d;
+  box-shadow: 0 0 0 4px rgba(184, 255, 61, 0.16);
+}
+
+.mikun-nav .md\:flex > button:not(:last-child) {
+  position: relative;
+}
+
+.mikun-nav .md\:flex > button:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.25rem;
+  height: 2px;
+  border-radius: 99px;
+  background: #b8ff3d;
+  transform: scaleX(0);
+  transition: transform 180ms ease;
+}
+
+.mikun-nav .md\:flex > button:not(:last-child):hover::after,
+.mikun-nav .md\:flex > button.text-brand-lime::after {
+  transform: scaleX(1);
+}
+
+.mikun-menu-band {
+  position: relative;
+  overflow: hidden;
+}
+
+.mikun-menu-band::before {
+  content: '';
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  right: -12rem;
+  top: -10rem;
+  border-radius: 50%;
+  background: rgba(184, 255, 61, 0.14);
+  pointer-events: none;
+}
+
+.mikun-menu-band > div,
+.mikun-reviews > div,
+.mikun-menu-page > div,
+.mikun-cart-page > div {
+  position: relative;
+  z-index: 1;
+}
+
+.mikun-menu-band article {
+  border-radius: 1.35rem;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.mikun-menu-band article:hover {
+  transform: translateY(-5px);
+}
+
+.mikun-menu-band article img {
+  transition: transform 500ms ease;
+}
+
+.mikun-menu-band article:hover img {
+  transform: scale(1.06);
+}
+
+.mikun-reviews {
+  background: #f4f8ed !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.mikun-reviews::before {
+  content: '“';
+  position: absolute;
+  top: -3rem;
+  left: 4%;
+  color: rgba(23, 59, 53, 0.07);
+  font-family: Georgia, serif;
+  font-size: 20rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.mikun-reviews .bg-white {
+  border-color: rgba(23, 59, 53, 0.1) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 16px 40px rgba(23, 59, 53, 0.07) !important;
+}
+
+.mikun-menu-page {
+  min-height: calc(100vh - 4rem);
+  background: #fffaf5;
+}
+
+.mikun-menu-page .glass,
+.mikun-cart-page .glass {
+  background: #ffffff;
+  border-color: rgba(23, 59, 53, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 16px 40px rgba(23, 59, 53, 0.08);
+}
+
+.mikun-menu-page .glass:hover,
+.mikun-cart-page .glass:hover {
+  box-shadow: 0 20px 48px rgba(23, 59, 53, 0.14);
+  transform: translateY(-3px);
+}
+
+.mikun-menu-page .glass,
+.mikun-menu-page .glass > div,
+.mikun-cart-page .glass {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.mikun-menu-page .glass > div:first-child {
+  position: relative;
+}
+
+.mikun-menu-page .glass > div:first-child::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 4rem;
+  background: linear-gradient(transparent, rgba(16, 47, 41, 0.18));
+  pointer-events: none;
+}
+
+.mikun-menu-page button,
+.mikun-cart-page button {
+  min-height: 2.75rem;
+}
+
+.mikun-menu-page .rounded-full.border,
+.mikun-menu-page .rounded-full.bg-white {
+  border-color: rgba(23, 59, 53, 0.16);
+}
+
+.mikun-cart-page {
+  background: #f4f8ed !important;
+}
+
+.mikun-cart-page .sticky {
+  top: 5.5rem;
+  border: 1px solid rgba(23, 59, 53, 0.12);
+  box-shadow: 0 18px 44px rgba(23, 59, 53, 0.1);
+}
+
+.mikun-cart-page .bg-gray-50 {
+  background: #f5f8f2;
+}
+
+.mikun-location {
+  background: #f1ffdf;
+  position: relative;
+  overflow: hidden;
+}
+
+.mikun-location::before {
+  content: '';
+  position: absolute;
+  width: 28rem;
+  height: 28rem;
+  left: -16rem;
+  bottom: -13rem;
+  border-radius: 50%;
+  border: 2rem solid rgba(184, 255, 61, 0.2);
+  pointer-events: none;
+}
+
+.mikun-location > div {
+  position: relative;
+  z-index: 1;
+}
+
+.mikun-location > div > div:first-child {
+  border-radius: 1.75rem 1.75rem 0 0;
+}
+
+.mikun-location iframe {
+  filter: saturate(0.82) contrast(1.02);
+}
+
+.mikun-footer {
+  border-top: 1px solid rgba(184, 255, 61, 0.16);
+}
+
+.mikun-footer a:hover {
+  color: #b8ff3d;
+}
+
+.mikun-footer input {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.mikun-cart-drawer {
+  border-left: 1px solid rgba(23, 59, 53, 0.12);
+}
+
+@media (max-width: 767px) {
+  .mikun-nav {
+    min-height: 4.25rem;
+  }
+
+  .mikun-nav img {
+    width: 8.5rem;
+    height: 2.8rem;
+  }
+
+  .mikun-menu-band,
+  .mikun-reviews,
+  .mikun-menu-page,
+  .mikun-cart-page,
+  .mikun-location {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .mikun-menu-page .glass,
+  .mikun-cart-page .glass {
+    border-radius: 1.35rem;
+  }
+
+  .mikun-location > div > div:first-child {
+    padding: 2rem 1.25rem;
+  }
 }
 
 /* Additional blur utilities */
