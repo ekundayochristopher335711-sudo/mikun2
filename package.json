@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "supabase:login": "npx supabase login",
     "supabase:migrate": "npx supabase db push",
-    "supabase:deploy:functions": "npx supabase functions deploy admin-reviews admin-food-availability"
+    "supabase:deploy:functions": "npx supabase functions deploy admin-orders admin-menu admin-reviews admin-upload"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

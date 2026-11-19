@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BRAND } from '../brand.js';
 import { menuDataNoImages } from '../menuData.js';
+import { supabase } from '../lib/supabase.js';
 
-const API = import.meta.env.VITE_API_URL || '';
+const API = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 const STATUSES = ['Order Received', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'];
 const CATEGORIES = ['Dishes', 'Proteins', 'Drinks'];
 
@@ -25,6 +26,16 @@ const demoMenu = () => menuDataNoImages.map(item => ({
   id: item.id, name: item.name, description: item.desc, price: item.price,
   category: item.category, available: item.available, image_url: item.image,
 }));
+
+async function callAdminFunction(name, key, options = {}) {
+  if (!supabase) throw new Error('Admin data service is not configured.');
+  const { data, error } = await supabase.functions.invoke(name, {
+    ...options,
+    headers: { ...options.headers, 'x-admin-key': key },
+  });
+  if (error) throw error;
+  return data;
+}
 
 export default function Admin() {
   const [key, setKey] = useState(() => sessionStorage.getItem('adminKey') || '');
@@ -61,11 +72,24 @@ export default function Admin() {
       return;
     }
     try {
-      const res = await fetch(`${API}/admin-orders`, { headers: { 'x-admin-key': adminKey } });
-      if (res.status === 401) { setError('Wrong password.'); return; }
-      if (!res.ok) { setError('Server error.'); return; }
-      setOrders(await res.json()); setError('');
-    } catch { setError('Could not connect to server.'); }
+      if (supabase) {
+        setOrders(await callAdminFunction('admin-orders', adminKey, { method: 'GET' }));
+      } else {
+        const res = await fetch(`${API}/admin/orders`, { headers: { 'x-admin-key': adminKey } });
+        if (res.status === 401) {
+          sessionStorage.removeItem('adminKey');
+          sessionStorage.removeItem('adminDemo');
+          setKey('');
+          setError('Admin session expired. Please sign in again.');
+          return;
+        }
+        if (!res.ok) throw new Error('Could not load admin orders.');
+        setOrders(await res.json());
+      }
+      setError('');
+    } catch (requestError) {
+      setError(requestError.message || 'Could not connect to the admin service.');
+    }
   }, []);
 
   const fetchReviews = useCallback(async (adminKey) => {
@@ -74,9 +98,8 @@ export default function Admin() {
       return;
     }
     try {
-      const res = await fetch(`${API}/admin-reviews`, { headers: { 'x-admin-key': adminKey } });
-      if (res.ok) setPendingReviews(await res.json());
-    } catch { /* silent */ }
+      setPendingReviews(await callAdminFunction('admin-reviews', adminKey, { method: 'GET' }));
+    } catch (requestError) { setError(requestError.message || 'Could not load reviews.'); }
   }, []);
 
   const fetchMenu = useCallback(async (adminKey) => {
@@ -87,25 +110,26 @@ export default function Admin() {
     }
     setMenuLoading(true);
     try {
-      const res = await fetch(`${API}/admin-menu`, { headers: { 'x-admin-key': adminKey } });
-      if (res.ok) {
-        const remoteItems = await res.json();
-        const remoteMatchesCatalog = remoteItems.length === menuDataNoImages.length && remoteItems.every(item => {
-          const local = menuDataNoImages.find(menuItem => menuItem.id === item.id);
-          return local && local.name === item.name && Number(item.price) === local.price;
-        });
-        setMenuItems(remoteMatchesCatalog ? remoteItems : menuDataNoImages.map(item => ({
-          id: item.id,
-          name: item.name,
-          description: item.desc,
-          price: item.price,
-          category: item.category,
-          available: item.available,
-          image_url: item.image,
-        })));
-      }
-    } catch { /* silent */ }
-    setMenuLoading(false);
+      const remoteItems = await callAdminFunction('admin-menu', adminKey, { method: 'GET' });
+      const remoteMatchesCatalog = remoteItems.length === menuDataNoImages.length && remoteItems.every(item => {
+        const local = menuDataNoImages.find(menuItem => menuItem.id === item.id);
+        return local && local.name === item.name && Number(item.price) === local.price;
+      });
+      setMenuItems(remoteMatchesCatalog ? remoteItems : menuDataNoImages.map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.desc,
+        price: item.price,
+        category: item.category,
+        available: item.available,
+        image_url: item.image,
+      })));
+      setMenuError('');
+    } catch (requestError) {
+      setMenuError(requestError.message || 'Could not load menu controls.');
+    } finally {
+      setMenuLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -131,12 +155,20 @@ export default function Admin() {
         setMenuItems(demoMenu());
         return;
       }
-      const res = await fetch(`${API}/admin-orders`, { headers: { 'x-admin-key': k } });
-      if (res.status === 401) { setError('Wrong password.'); return; }
-      if (!res.ok) { setError('Could not connect to server.'); return; }
+      let orders;
+      if (supabase) {
+        orders = await callAdminFunction('admin-orders', k, { method: 'GET' });
+      } else {
+        const res = await fetch(`${API}/admin/orders`, { headers: { 'x-admin-key': k } });
+        if (res.status === 401) { setError('Wrong password.'); return; }
+        if (!res.ok) { setError('Could not connect to server.'); return; }
+        orders = await res.json();
+      }
       sessionStorage.setItem('adminKey', k);
-      setKey(k); setOrders(await res.json());
-    } catch { setError('Could not connect to server.'); }
+      sessionStorage.removeItem('adminDemo');
+      setIsDemoMode(false);
+      setKey(k); setOrders(orders);
+    } catch (requestError) { setError(requestError.message || 'Could not connect to server.'); }
     finally { setLoggingIn(false); }
   };
 
@@ -149,13 +181,18 @@ export default function Admin() {
       return;
     }
     try {
-      await fetch(`${API}/admin-orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
-        body: JSON.stringify({ orderId, status }),
-      });
+      if (supabase) {
+        await callAdminFunction('admin-orders', key, { method: 'POST', body: { orderId, status } });
+      } else {
+        const res = await fetch(`${API}/admin/orders/${encodeURIComponent(orderId)}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) throw new Error('Could not update order status.');
+      }
       await fetchOrders(key);
-    } catch { alert('Failed to update status.'); }
+    } catch (requestError) { setError(requestError.message || 'Failed to update status.'); }
     setUpdating(null);
   };
 
@@ -168,13 +205,9 @@ export default function Admin() {
       return;
     }
     try {
-      await fetch(`${API}/admin-reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
-        body: JSON.stringify({ id, action }),
-      });
+      await callAdminFunction('admin-reviews', key, { method: 'POST', body: { id, action } });
       await fetchReviews(key);
-    } catch { alert('Action failed.'); }
+    } catch (requestError) { setError(requestError.message || 'Review action failed.'); }
     setReviewAction(null);
   };
 
@@ -191,25 +224,23 @@ export default function Admin() {
       });
       return true;
     }
-    const res = await fetch(`${API}/admin-menu`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (!res.ok) { setMenuError(data.error || 'Action failed.'); return false; }
-    return true;
+    try {
+      await callAdminFunction('admin-menu', key, { method: 'POST', body });
+      return true;
+    } catch (requestError) {
+      setMenuError(requestError.message || 'Action failed.');
+      return false;
+    }
   };
 
   const uploadImage = async (file, onDone) => {
     setUploading(true); setMenuError('');
     try {
       const fd = new FormData(); fd.append('file', file);
-      const res = await fetch(`${API}/admin-upload`, { method: 'POST', headers: { 'x-admin-key': key }, body: fd });
-      const data = await res.json();
+      const data = await callAdminFunction('admin-upload', key, { method: 'POST', body: fd });
       if (data.url) onDone(data.url);
       else setMenuError(data.error || 'Upload failed');
-    } catch { setMenuError('Upload failed'); }
+    } catch (requestError) { setMenuError(requestError.message || 'Upload failed'); }
     setUploading(false);
   };
 
@@ -218,18 +249,18 @@ export default function Admin() {
       setMenuError('Name, price, and category are required.'); return;
     }
     const ok = await menuCall({ action: 'add', ...addForm, price: Number(addForm.price) });
-    if (ok) { setMenuMsg('Item added!'); setAddForm(BLANK_FORM); setShowAddForm(false); await fetchMenu(key); }
+    if (ok) { setMenuMsg('Item added!'); setAddForm(BLANK_FORM); setShowAddForm(false); if (!isDemoMode) await fetchMenu(key); }
   };
 
   const saveEdit = async () => {
     const ok = await menuCall({ action: 'edit', id: editingId, ...editForm, price: Number(editForm.price) });
-    if (ok) { setMenuMsg('Item updated!'); setEditingId(null); await fetchMenu(key); }
+    if (ok) { setMenuMsg('Item updated!'); setEditingId(null); if (!isDemoMode) await fetchMenu(key); }
   };
 
   const deleteItem = async (id, name) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     const ok = await menuCall({ action: 'delete', id });
-    if (ok) { setMenuMsg('Item deleted.'); await fetchMenu(key); }
+    if (ok) { setMenuMsg('Item deleted.'); if (!isDemoMode) await fetchMenu(key); }
   };
 
   const toggleAvailability = async (item) => {
@@ -240,7 +271,7 @@ export default function Admin() {
       action: 'toggle', id: item.id, available: newAvailable,
       unavailableUntil: newAvailable ? null : (until ? new Date(until).toISOString() : new Date(Date.now() + 3600000).toISOString()),
     });
-    if (ok) await fetchMenu(key);
+    if (ok && !isDemoMode) await fetchMenu(key);
     setTogglingId(null);
   };
 
@@ -339,6 +370,7 @@ export default function Admin() {
           </div>
           <span className="mikun-admin-live"><i /> LIVE</span>
         </div>
+        {error && <div className="mikun-admin-error mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>}
 
         {/* Desktop tabs */}
         <div className="hidden">

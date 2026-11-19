@@ -67,7 +67,7 @@ After the migration, deploy the admin functions with:
 npm run supabase:deploy:functions
 ```
 
-This will deploy the `admin-reviews` and `admin-food-availability` functions.
+This deploys the admin dashboard functions used by `/admin`: `admin-orders`, `admin-menu`, `admin-reviews`, and `admin-upload`.
 
 ## Verification flow
 
