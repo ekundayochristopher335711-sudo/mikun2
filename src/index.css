@@ -1464,6 +1464,32 @@ select {
   font-weight: 800;
 }
 
+.mikun-admin-demo-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.68rem;
+}
+
+.mikun-admin-demo-divider::before,
+.mikun-admin-demo-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.mikun-admin-demo-button {
+  border: 1px solid rgba(184, 255, 61, 0.3);
+  background: rgba(184, 255, 61, 0.08);
+  color: #d5ff9c;
+}
+
+.mikun-admin-demo-button:hover {
+  background: rgba(184, 255, 61, 0.16);
+}
+
 /* Mobile storefront bar follows the supplied five-action layout while using
    Mikun's mint/lime accent instead of the reference pink. */
 .mikun-mobile-nav {

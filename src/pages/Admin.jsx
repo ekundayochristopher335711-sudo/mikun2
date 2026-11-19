@@ -39,7 +39,9 @@ async function callAdminFunction(name, key, options = {}) {
 
 export default function Admin() {
   const [key, setKey] = useState(() => sessionStorage.getItem('adminKey') || '');
-  const [isDemoMode, setIsDemoMode] = useState(() => sessionStorage.getItem('adminDemo') === 'true');
+  const [isDemoMode, setIsDemoMode] = useState(() => (
+    sessionStorage.getItem('adminDemo') === 'true' || sessionStorage.getItem('adminKey') === DEMO_ADMIN_KEY
+  ));
   const [input, setInput] = useState('');
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
@@ -146,13 +148,7 @@ export default function Admin() {
     setError(''); setLoggingIn(true);
     try {
       if (k === DEMO_ADMIN_KEY) {
-        sessionStorage.setItem('adminKey', k);
-        sessionStorage.setItem('adminDemo', 'true');
-        setIsDemoMode(true);
-        setKey(k);
-        setOrders(DEMO_ORDERS);
-        setPendingReviews(DEMO_REVIEWS);
-        setMenuItems(demoMenu());
+        enterDemoAdmin();
         return;
       }
       let orders;
@@ -170,6 +166,17 @@ export default function Admin() {
       setKey(k); setOrders(orders);
     } catch (requestError) { setError(requestError.message || 'Could not connect to server.'); }
     finally { setLoggingIn(false); }
+  };
+
+  const enterDemoAdmin = () => {
+    sessionStorage.setItem('adminKey', DEMO_ADMIN_KEY);
+    sessionStorage.setItem('adminDemo', 'true');
+    setError('');
+    setIsDemoMode(true);
+    setKey(DEMO_ADMIN_KEY);
+    setOrders(DEMO_ORDERS);
+    setPendingReviews(DEMO_REVIEWS);
+    setMenuItems(demoMenu());
   };
 
   // ── Orders ─────────────────────────────────────────────────────────────────
@@ -302,7 +309,12 @@ export default function Admin() {
             className="mikun-admin-primary w-full rounded-xl py-4 font-black text-white transition disabled:opacity-60">
             {loggingIn ? 'Checking...' : 'Login'}
           </button>
-          <p className="mikun-admin-demo-hint mt-5 text-center text-xs">Demo access: <code>mikun-demo</code></p>
+          <div className="mikun-admin-demo-divider my-5"><span>or</span></div>
+          <button type="button" onClick={enterDemoAdmin}
+            className="mikun-admin-demo-button w-full rounded-xl py-3.5 font-bold transition">
+            Open demo admin
+          </button>
+          <p className="mikun-admin-demo-hint mt-3 text-center text-xs">Demo password: <code>mikun-demo</code></p>
         </div>
       </div>
     );
